@@ -1,0 +1,143 @@
+/* 
+ *  Squeezelite - lightweight headless squeezeplay emulator for linux
+ *
+ *  (c) Adrian Smith 2012, triode1@btinternet.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+// decode thread
+
+#include "squeezelite.h"
+
+log_level loglevel;
+
+extern struct buffer *streambuf;
+extern struct buffer *outputbuf;
+extern struct streamstate stream;
+extern struct outputstate output;
+
+#define LOCK_S   pthread_mutex_lock(&streambuf->mutex)
+#define UNLOCK_S pthread_mutex_unlock(&streambuf->mutex)
+#define LOCK_O   pthread_mutex_lock(&outputbuf->mutex)
+#define UNLOCK_O pthread_mutex_unlock(&outputbuf->mutex)
+
+struct decodestate decode;
+struct codec *codecs[MAX_CODECS];
+static struct codec *codec;
+static bool running = true;
+
+static void *decode_thread() {
+
+	while (running) {
+
+		LOCK_S;
+		size_t bytes = _buf_used(streambuf);
+		bool toend = (stream.state <= DISCONNECT);
+		UNLOCK_S;
+		LOCK_O;
+		size_t space = _buf_space(outputbuf);
+		decode_state state = decode.state;
+		UNLOCK_O;
+
+		if (state == DECODE_RUNNING) {
+		
+			LOG_SDEBUG("streambuf bytes: %u outputbuf space: %u", bytes, space);
+			
+			if (space > codec->min_space && bytes && (bytes > codec->min_read_bytes || toend)) {
+				
+				codec->decode();
+
+			} else if (toend && bytes == 0) {
+
+				LOG_INFO("decode complete");
+				LOCK_O;
+				decode.state = DECODE_COMPLETE;
+				UNLOCK_O;
+				wake_controller();
+
+			} else {
+				usleep(100000);
+			}
+
+		} else {
+			usleep(100000);
+		}
+
+	}
+
+	return 0;
+}
+
+static pthread_t thread;
+
+void decode_init(log_level level, const char *opt) {
+	loglevel = level;
+
+	LOG_INFO("init decode");
+
+	// register codecs
+	if (!opt || !strcmp(opt, "flac")) codecs[0] = register_flac();
+	if (!opt || !strcmp(opt, "pcm"))  codecs[1] = register_pcm();
+	if (!opt || !strcmp(opt, "mp3"))  codecs[2] = register_mad();
+
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setstacksize(&attr, DECODE_THREAD_STACK_SIZE);
+	pthread_create(&thread, &attr, decode_thread, NULL);
+	pthread_attr_destroy(&attr);
+
+	decode.new_stream = true;
+	decode.state = DECODE_STOPPED;
+}
+
+void decode_close(void) {
+	LOG_INFO("close decode");
+	if (codec) {
+		codec->close();
+	}
+	codec = NULL;
+	running = false;
+}
+
+void codec_open(u8_t format, u8_t sample_size, u8_t sample_rate, u8_t channels, u8_t endianness) {
+	LOG_INFO("codec open: '%c'", format);
+
+	LOCK_O;
+	decode.new_stream = true;
+	decode.state = DECODE_STOPPED;
+	UNLOCK_O;
+
+	// find the required codec
+	int i;
+	for (i = 0; i < MAX_CODECS; ++i) {
+
+		if (codecs[i] && codecs[i]->id == format) {
+
+			if (codec && codec != codecs[i]) {
+				LOG_INFO("closing codec");
+				codec->close();
+			}
+			
+			codec = codecs[i];
+			
+			codec->open(sample_size, sample_rate, channels, endianness);
+			
+			return;
+		}
+	}
+
+	LOG_ERROR("codec not found");
+}
