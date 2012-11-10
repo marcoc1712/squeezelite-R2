@@ -208,6 +208,21 @@ static void sendRESP(const char *header, size_t len) {
 	send_packet((u8_t *)header, len);
 }
 
+static void sendSETDName(const char *name) {
+	struct SETD_header pkt_header;
+
+	memset(&pkt_header, 0, sizeof(pkt_header));
+	memcpy(&pkt_header.opcode, "SETD", 4);
+
+	pkt_header.id = 0; // id 0 is playername S:P:Squeezebox2
+	pkt_header.length = htonl(sizeof(pkt_header) + strlen(name) + 1 - 8);
+
+	LOG_INFO("set playername: %s", name);
+
+	send_packet((u8_t *)&pkt_header, sizeof(pkt_header));
+	send_packet((u8_t *)name, strlen(name) + 1);
+}
+
 static void process_strm(u8_t *pkt, int len) {
 	struct strm_packet *strm = (struct strm_packet *)pkt;
 
@@ -296,6 +311,12 @@ static void process_cont(u8_t *pkt, int len) {
 	}
 }
 
+static void process_aude(u8_t *pkt, int len) {
+	struct aude_packet *aude = (struct aude_packet *)pkt;
+
+	LOG_INFO("enable spdif: %d dac: %d", aude->enable_spdif, aude->enable_dac);
+}
+
 static void process_audg(u8_t *pkt, int len) {
 	struct audg_packet *audg = (struct audg_packet *)pkt;
 	audg->gainL = unpackN(&audg->gainL);
@@ -317,7 +338,7 @@ struct handler {
 static struct handler handlers[] = {
 	{ "strm", process_strm },
 	{ "cont", process_cont },
-	// aude - ignore for the moment - enable/disable audio output from S:P:Squeezebox2
+	{ "aude", process_aude },
 	{ "audg", process_audg },
 	{ "",     NULL  },
 };
@@ -530,7 +551,7 @@ in_addr_t discover_server(void) {
 	return s.sin_addr.s_addr;
 }
 
-void slimproto(log_level level, const char *addr, u8_t mac[6]) {
+void slimproto(log_level level, const char *addr, u8_t mac[6], const char *name) {
     struct sockaddr_in serv_addr;
 	static char buf[128];
 	bool reconnect = false;
@@ -574,6 +595,11 @@ void slimproto(log_level level, const char *addr, u8_t mac[6]) {
 
 			sendHELO(reconnect, buf, mac);
 			reconnect = true;
+
+			if (name) {
+				sendSETDName(name);
+				name = NULL;
+			}
 
 			slimproto_run();
 
