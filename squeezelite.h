@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <poll.h>
 
-#define VERSION "v0.2beta1"
+#define VERSION "v0.3beta1"
 
 #define STREAMBUF_SIZE (2 * 1024 * 1024)
 #define OUTPUTBUF_SIZE (44100 * 8 * 10)
@@ -148,7 +148,7 @@ void decode_close(void);
 void codec_open(u8_t format, u8_t sample_size, u8_t sample_rate, u8_t channels, u8_t endianness);
 
 // output.c
-typedef enum { OUTPUT_STOPPED = 0, OUTPUT_BUFFER, OUTPUT_RUNNING, 
+typedef enum { OUTPUT_OFF = -1, OUTPUT_STOPPED = 0, OUTPUT_BUFFER, OUTPUT_RUNNING, 
 			   OUTPUT_PAUSE_FRAMES, OUTPUT_SKIP_FRAMES, OUTPUT_START_AT } output_state;
 
 struct outputstate {

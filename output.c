@@ -269,10 +269,18 @@ static bool running = true;
 static void *output_thread() {
 	snd_pcm_t *pcmp = NULL;
 	bool start = true;
-	bool probe_device = false;
+	bool output_off = false, probe_device = false;
 	int err;
 
 	while (running) {
+
+		// disabled output - player is off
+		while (output_off) {
+			usleep(100000);
+			LOCK;
+			output_off = (output.state == OUTPUT_OFF);
+			UNLOCK;
+		}
 
 		// wait until device returns - to allow usb audio devices to be turned off
 		if (probe_device) {
@@ -351,6 +359,16 @@ static void *output_thread() {
 
 		snd_pcm_sframes_t frames = _buf_used(outputbuf) / BYTES_PER_FRAME;
 		bool silence = false;
+
+		// turn off if requested
+		if (output.state == OUTPUT_OFF) {
+			UNLOCK;
+			alsa_close(pcmp);
+			pcmp = NULL;
+			output_off = true;
+			LOG_INFO("disabling output");
+			continue;
+		}
 
 		// start when threashold met, note: avail * 4 may need tuning
 		if (output.state == OUTPUT_BUFFER && frames > avail * 4 && frames > output.threshold * output.next_sample_rate / 100) {

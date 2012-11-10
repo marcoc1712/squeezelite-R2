@@ -315,6 +315,15 @@ static void process_aude(u8_t *pkt, int len) {
 	struct aude_packet *aude = (struct aude_packet *)pkt;
 
 	LOG_INFO("enable spdif: %d dac: %d", aude->enable_spdif, aude->enable_dac);
+
+	LOCK_O;
+	if (!aude->enable_spdif && output.state != OUTPUT_OFF) {
+		output.state = OUTPUT_OFF;
+	}
+	if (aude->enable_spdif && output.state == OUTPUT_OFF) {
+		output.state = OUTPUT_STOPPED;
+	}
+	UNLOCK_O;
 }
 
 static void process_audg(u8_t *pkt, int len) {

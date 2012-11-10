@@ -25,9 +25,9 @@
 
 #define LIBFLAC "libFLAC.so.8"
 
-// FLAC symbols to be dynamically loaded
 struct flac {
 	FLAC__StreamDecoder *decoder;
+	// FLAC symbols to be dynamically loaded
 	FLAC_API const char **FLAC__StreamDecoderErrorStatusString;
 	FLAC_API const char **FLAC__StreamDecoderStateString;
 	FLAC_API FLAC__StreamDecoder * (* FLAC__stream_decoder_new)(void);
