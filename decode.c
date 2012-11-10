@@ -89,9 +89,11 @@ void decode_init(log_level level, const char *opt) {
 	LOG_INFO("init decode");
 
 	// register codecs
-	if (!opt || !strcmp(opt, "flac")) codecs[0] = register_flac();
-	if (!opt || !strcmp(opt, "pcm"))  codecs[1] = register_pcm();
-	if (!opt || !strcmp(opt, "mp3"))  codecs[2] = register_mad();
+	// alc,wma,wmap,wmal,aac,spt,ogg,ogf,flc,aif,pcm,mp3
+	if (!opt || !strcmp(opt, "ogg"))  codecs[0] = register_vorbis();
+	if (!opt || !strcmp(opt, "flac")) codecs[1] = register_flac();
+	if (!opt || !strcmp(opt, "pcm"))  codecs[2] = register_pcm();
+	if (!opt || !strcmp(opt, "mp3"))  codecs[3] = register_mad();
 
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);

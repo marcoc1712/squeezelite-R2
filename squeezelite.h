@@ -43,7 +43,7 @@
 #define MAX_HEADER 2048
 
 #define STREAM_THREAD_STACK_SIZE (PTHREAD_STACK_MIN * 4)
-#define DECODE_THREAD_STACK_SIZE (PTHREAD_STACK_MIN * 4)
+#define DECODE_THREAD_STACK_SIZE (PTHREAD_STACK_MIN * 8)
 #define OUTPUT_THREAD_STACK_SIZE (PTHREAD_STACK_MIN * 4)
 
 #define ALSA_BUFFER_TIME 20000
@@ -101,7 +101,7 @@ void buf_init(struct buffer *buf, size_t size);
 void buf_destroy(struct buffer *buf);
 
 // slimproto.c
-void slimproto(log_level level, const char *addr, u8_t mac[6]);
+void slimproto(log_level level, const char *addr, u8_t mac[6], const char *name);
 void wake_controller(void);
 
 // stream.c
@@ -186,3 +186,4 @@ void stream_disconnect(void);
 struct codec *register_flac(void);
 struct codec *register_pcm(void);
 struct codec *register_mad(void);
+struct codec *register_vorbis(void);
