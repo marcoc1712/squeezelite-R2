@@ -168,6 +168,9 @@ static void faad_open(u8_t size, u8_t rate, u8_t chan, u8_t endianness) {
 		return;
 	}
 
+	if (a->hAac) {
+		a->NeAACDecClose(a->hAac);
+	}
 	a->hAac = a->NeAACDecOpen();
 
 	NeAACDecConfigurationPtr conf = a->NeAACDecGetCurrentConfiguration(a->hAac);
@@ -182,6 +185,7 @@ static void faad_open(u8_t size, u8_t rate, u8_t chan, u8_t endianness) {
 
 static void faad_close(void) {
 	a->NeAACDecClose(a->hAac);
+	a->hAac = NULL;
 }
 
 static bool load_faad() {
@@ -193,6 +197,7 @@ static bool load_faad() {
 
 	a = malloc(sizeof(struct faad));
 
+	a->hAac = NULL;
 	a->NeAACDecGetCapabilities = dlsym(handle, "NeAACDecGetCapabilities");
 	a->NeAACDecGetCurrentConfiguration = dlsym(handle, "NeAACDecGetCurrentConfiguration");
 	a->NeAACDecSetConfiguration = dlsym(handle, "NeAACDecSetConfiguration");
