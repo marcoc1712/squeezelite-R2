@@ -151,6 +151,9 @@ static void mad_decode(void) {
 }
 
 static void mad_open(u8_t size, u8_t rate, u8_t chan, u8_t endianness) {
+	if (!m->readbuf) {
+		m->readbuf = malloc(READBUF_SIZE + MAD_BUFFER_GUARD);
+	}
 	m->readbuf_len = 0;
 	m->mad_stream_init(&m->stream);
 	m->mad_frame_init(&m->frame);
@@ -161,6 +164,8 @@ static void mad_close(void) {
 	mad_synth_finish(&m->synth);
 	m->mad_frame_finish(&m->frame);
 	m->mad_stream_finish(&m->stream);
+	free(m->readbuf);
+	m->readbuf = NULL;
 }
 
 static bool load_mad() {
@@ -171,8 +176,8 @@ static bool load_mad() {
 	}
 
 	m = malloc(sizeof(struct mad));
-	m->readbuf = malloc(READBUF_SIZE + MAD_BUFFER_GUARD);
 
+	m->readbuf = NULL;
 	m->readbuf_len = 0;
 	m->mad_stream_init = dlsym(handle, "mad_stream_init");
 	m->mad_frame_init = dlsym(handle, "mad_frame_init");

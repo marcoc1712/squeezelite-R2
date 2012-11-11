@@ -3,8 +3,8 @@ LDFLAGS = -lasound -lpthread -ldl -lrt
 
 all: squeezelite
 
-squeezelite: main.o slimproto.o utils.o output.o buffer.o stream.o decode.o flac.o pcm.o mad.o vorbis.o
-	$(CC) $(CFLAGS) main.o slimproto.o utils.o output.o buffer.o stream.o decode.o flac.o pcm.o mad.o vorbis.o $(LDFLAGS) -o squeezelite
+squeezelite: main.o slimproto.o utils.o output.o buffer.o stream.o decode.o flac.o pcm.o mad.o vorbis.o faad.o
+	$(CC) $(CFLAGS) main.o slimproto.o utils.o output.o buffer.o stream.o decode.o flac.o pcm.o mad.o vorbis.o faad.o $(LDFLAGS) -o squeezelite
 
 main.o: main.c squeezelite.h
 	$(CC) $(CFLAGS) -c main.c -o main.o
@@ -39,3 +39,5 @@ mad.o: mad.c squeezelite.h
 vorbis.o: vorbis.c squeezelite.h
 	$(CC) $(CFLAGS) -c vorbis.c -o vorbis.o
 
+faad.o: faad.c squeezelite.h
+	$(CC) $(CFLAGS) -c faad.c -o faad.o

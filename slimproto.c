@@ -435,6 +435,7 @@ static void slimproto_run() {
 			bool _sendSTMl = false;
 			bool _sendSTMu = false;
 			bool _sendSTMo = false;
+			bool _sendSTMn = false;
 			disconnect_code disconnect;
 			static char header[MAX_HEADER];
 			size_t header_len;
@@ -475,6 +476,10 @@ static void slimproto_run() {
 				_sendSTMd = true;
 				decode.state = DECODE_STOPPED;
 			}
+			if (decode.state == DECODE_ERROR) {
+				_sendSTMn = true;
+				decode.state = DECODE_STOPPED;
+			}
 			if (status.stream_state == STREAMING_HTTP && !sentSTMl && decode.state == DECODE_STOPPED) {
 				if (autostart == 0) {
 					_sendSTMl = true;
@@ -509,6 +514,7 @@ static void slimproto_run() {
 			if (_sendSTMl) sendSTAT("STMl", 0);
 			if (_sendSTMu) sendSTAT("STMu", 0);
 			if (_sendSTMo) sendSTAT("STMo", 0);
+			if (_sendSTMn) sendSTAT("STMn", 0);
 			if (_sendRESP) sendRESP(header, header_len);
 		}
 	}

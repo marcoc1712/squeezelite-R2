@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <poll.h>
 
-#define VERSION "v0.3beta1"
+#define VERSION "v0.4beta1"
 
 #define STREAMBUF_SIZE (2 * 1024 * 1024)
 #define OUTPUTBUF_SIZE (44100 * 8 * 10)
@@ -124,7 +124,7 @@ void stream_local(const char *filename);
 void stream_sock(u32_t ip, u16_t port, const char *header, size_t header_len, unsigned threshold);
 
 // decode.c
-typedef enum { DECODE_STOPPED = 0, DECODE_RUNNING, DECODE_COMPLETE } decode_state;
+typedef enum { DECODE_STOPPED = 0, DECODE_RUNNING, DECODE_COMPLETE, DECODE_ERROR } decode_state;
 
 struct decodestate {
 	decode_state state;
@@ -140,8 +140,6 @@ struct codec {
 	void (*close)(void);
 	void (*decode)(void);
 };
-
-#define MAX_CODECS 5
 
 void decode_init(log_level level, const char *opt);
 void decode_close(void);
@@ -183,7 +181,10 @@ void output_close(void);
 void stream_disconnect(void);
 
 // codecs
+#define MAX_CODECS 5
+
 struct codec *register_flac(void);
 struct codec *register_pcm(void);
 struct codec *register_mad(void);
 struct codec *register_vorbis(void);
+struct codec *register_faad(void);
