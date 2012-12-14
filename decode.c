@@ -56,17 +56,20 @@ static void *decode_thread() {
 		
 			LOG_SDEBUG("streambuf bytes: %u outputbuf space: %u", bytes, space);
 			
-			if (space > codec->min_space && bytes && (bytes > codec->min_read_bytes || toend)) {
+			if (space > codec->min_space && (bytes > codec->min_read_bytes || toend)) {
 				
-				codec->decode();
+				state = codec->decode();
 
-			} else if (toend && bytes == 0) {
+				if (state != DECODE_RUNNING) {
 
-				LOG_INFO("decode complete");
-				LOCK_O;
-				decode.state = DECODE_COMPLETE;
-				UNLOCK_O;
-				wake_controller();
+					LOG_INFO("decode %s", state == DECODE_COMPLETE ? "complete" : "error");
+
+					LOCK_O;
+					decode.state = state;
+					UNLOCK_O;
+
+					wake_controller();
+				}
 
 			} else {
 				usleep(100000);
