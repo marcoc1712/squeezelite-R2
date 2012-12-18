@@ -59,6 +59,10 @@ static inline s32_t gain(s32_t gain, s32_t sample) {
 	return (s32_t) (res >> 16);
 }
 
+static inline s32_t to_gain(float f) {
+	return (s32_t)(f * 65536.0F);
+}
+
 void alsa_list_pcm(void) {
 	void **hints, **n;
 	if (snd_device_name_hint(-1, "pcm", &hints) >= 0) {
@@ -447,10 +451,15 @@ static void *output_thread() {
 		output.alsa_frames = delay;
 		output.updated = gettime_ms();
 
+		s32_t cross_gain_in = 0; s32_t *cross_ptr = NULL;
+
 		while (size > 0) {
 			snd_pcm_uframes_t alsa_frames;
 			
 			frames_t cont_frames = _buf_cont_read(outputbuf) / BYTES_PER_FRAME;
+
+			s32_t gainL = output.current_replay_gain ? gain(output.gainL, output.current_replay_gain) : output.gainL;
+			s32_t gainR = output.current_replay_gain ? gain(output.gainR, output.current_replay_gain) : output.gainR;
 			
 			if (output.track_start && !silence) {
 				if (output.track_start == outputbuf->readp) {
@@ -467,12 +476,76 @@ static void *output_thread() {
 				}
 			}
 
-			alsa_frames = !silence ? min(size, cont_frames) : size;
+			if (output.fade && !silence) {
+				if (output.fade == FADE_DUE) {
+					if (output.fade_start == outputbuf->readp) {
+						LOG_INFO("fade start reached");
+						output.fade = FADE_ACTIVE;
+					} else if (output.fade_start > outputbuf->readp) {
+						cont_frames = min(cont_frames, (output.fade_start - outputbuf->readp) / BYTES_PER_FRAME);
+					}
+				}
+				if (output.fade == FADE_ACTIVE) {
+					// find position within fade
+					frames_t cur_f = outputbuf->readp >= output.fade_start ? (outputbuf->readp - output.fade_start) / BYTES_PER_FRAME : 
+						(outputbuf->readp + outputbuf->size - output.fade_start) / BYTES_PER_FRAME;
+					frames_t dur_f = output.fade_end >= output.fade_start ? (output.fade_end - output.fade_start) / BYTES_PER_FRAME :
+						(output.fade_end + outputbuf->size - output.fade_start) / BYTES_PER_FRAME;
+					if (cur_f >= dur_f) {
+						if (output.fade_mode == FADE_INOUT && output.fade_dir == FADE_DOWN) {
+							LOG_INFO("fade down complete, starting fade up");
+							output.fade_dir = FADE_UP;
+							output.fade_start = outputbuf->readp;
+							output.fade_end = outputbuf->readp + dur_f * BYTES_PER_FRAME;
+							if (output.fade_end >= outputbuf->wrap) {
+								output.fade_end -= outputbuf->size;
+							}
+							cur_f = 0;
+						} else if (output.fade_mode == FADE_CROSSFADE) {
+							LOG_INFO("crossfade complete");
+							if (_buf_used(outputbuf) >= dur_f * BYTES_PER_FRAME) {
+								_buf_inc_readp(outputbuf, dur_f * BYTES_PER_FRAME);
+								LOG_INFO("skipped crossfaded start");
+							} else {
+								LOG_WARN("unable to skip crossfaded start");
+							}
+							output.fade = FADE_NONE;
+						} else {
+							LOG_INFO("fade complete");
+							output.fade = FADE_NONE;
+						}
+					}
+					// if fade in progress set fade gain, ensure cont_frames reduced so we get to end of fade at start of chunk
+					if (output.fade) {
+						if (output.fade_end > outputbuf->readp) {
+							cont_frames = min(cont_frames, (output.fade_end - outputbuf->readp) / BYTES_PER_FRAME);
+						}
+						if (output.fade_dir == FADE_UP || output.fade_dir == FADE_DOWN) {
+							// fade in, in-out, out handled via altering standard gain
+							if (output.fade_dir == FADE_DOWN) {
+								cur_f = dur_f - cur_f;
+							}
+							s32_t fade_gain = to_gain((float)cur_f / (float)dur_f);
+							gainL = gain(gainL, fade_gain);
+							gainR = gain(gainR, fade_gain);
+						}
+						if (output.fade_dir == FADE_CROSS) {
+							// cross fade requires special treatment - performed later based on these values
+							if (_buf_used(outputbuf) / BYTES_PER_FRAME > dur_f + size) { 
+								cross_gain_in = to_gain((float)cur_f / (float)dur_f);
+								cross_ptr = (s32_t *)(output.fade_end + cur_f * BYTES_PER_FRAME);
+							} else {
+								LOG_INFO("unable to continue crossfade - too few samples");
+								output.fade = FADE_NONE;
+							}
+						}
+					}
+				}
+			}
+
+ 			alsa_frames = !silence ? min(size, cont_frames) : size;
 
 			avail = snd_pcm_avail_update(pcmp);
-
-			s32_t gainL = output.current_replay_gain ? gain(output.gainL, output.current_replay_gain) : output.gainL;
-			s32_t gainR = output.current_replay_gain ? gain(output.gainR, output.current_replay_gain) : output.gainR;
 
 			if (alsa.mmap) {
 
@@ -484,9 +557,23 @@ static void *output_thread() {
 					break;
 				}
 
+				// perform crossfade buffer copying here as we do not know the actual alsa_frames value until here
+				if (output.fade == FADE_ACTIVE && output.fade_dir == FADE_CROSS) {
+					s32_t *ptr = (s32_t *)(void *)outputbuf->readp;
+					frames_t count = alsa_frames * 2;
+					s32_t cross_gain_out = FIXED_ONE - cross_gain_in;
+					while (count--) {
+						if (cross_ptr > (s32_t *)outputbuf->wrap) {
+							cross_ptr -= outputbuf->size / BYTES_PER_FRAME * 2;
+						}
+						*ptr = gain(cross_gain_out, *ptr) + gain(cross_gain_in, *cross_ptr);
+						ptr++; cross_ptr++;
+					}
+				}
+
 				void  *outputptr = areas[0].addr + (areas[0].first + offset * areas[0].step) / 8;
 				s32_t *inputptr  = (s32_t *) (silence ? silencebuf : outputbuf->readp);
-				size_t cnt = alsa_frames;
+				frames_t cnt = alsa_frames;
 				
 				switch(alsa.format) {
 				case SND_PCM_FORMAT_S16_LE:
@@ -703,13 +790,26 @@ static void *output_thread() {
 
 			} else {
 
+				if (output.fade == FADE_ACTIVE && output.fade_dir == FADE_CROSS) {
+					s32_t *ptr = (s32_t *)(void *)outputbuf->readp;
+					frames_t count = alsa_frames * 2;
+					s32_t cross_gain_out = FIXED_ONE - cross_gain_in;
+					while (count--) {
+						if (cross_ptr > (s32_t *)outputbuf->wrap) {
+							cross_ptr -= outputbuf->size / BYTES_PER_FRAME * 2;
+						}
+						*ptr = gain(cross_gain_out, *ptr) + gain(cross_gain_in, *cross_ptr);
+						ptr++; cross_ptr++;
+					}
+				}
+
 				if (!silence && (gainL != FIXED_ONE || gainR!= FIXED_ONE)) {
 					unsigned count = alsa_frames;
 					s32_t *ptrL = (s32_t *)(void *)outputbuf->readp;
 					s32_t *ptrR = (s32_t *)(void *)outputbuf->readp + 1;
 					while (count--) {
-						*ptrL = gain(output.gainL, *ptrL);
-						*ptrR = gain(output.gainR, *ptrR);
+						*ptrL = gain(gainL, *ptrL);
+						*ptrR = gain(gainR, *ptrR);
 						ptrL += 2;
 						ptrR += 2;
 					}
@@ -743,6 +843,57 @@ static void *output_thread() {
 	return 0;
 }
 
+void _checkfade(bool start) {
+	LOG_INFO("fade mode: %u duration: %u %s", output.fade_mode, output.fade_secs, start ? "track-start" : "track-end");
+
+	frames_t bytes = output.next_sample_rate * BYTES_PER_FRAME * output.fade_secs;
+	if (output.fade_mode == FADE_INOUT) {
+		bytes /= 2;
+	}
+
+	if (start && (output.fade_mode == FADE_IN || (output.fade_mode == FADE_INOUT && _buf_used(outputbuf) == 0))) {
+		bytes = min(bytes, outputbuf->size - BYTES_PER_FRAME); // shorter than full buffer otherwise start and end align
+		LOG_INFO("fade IN: %u frames", bytes / BYTES_PER_FRAME);
+		output.fade = FADE_DUE;
+		output.fade_dir = FADE_UP;
+		output.fade_start = outputbuf->writep;
+		output.fade_end = output.fade_start + bytes;
+		if (output.fade_end >= outputbuf->wrap) {
+			output.fade_end -= outputbuf->size;
+		}
+	}
+
+	if (!start && (output.fade_mode == FADE_OUT || output.fade_mode == FADE_INOUT)) {
+		bytes = min(_buf_used(outputbuf), bytes);
+		LOG_INFO("fade %s: %u frames", output.fade_mode == FADE_INOUT ? "IN-OUT" : "OUT", bytes / BYTES_PER_FRAME);
+		output.fade = FADE_DUE;
+		output.fade_dir = FADE_DOWN;
+		output.fade_start = outputbuf->writep - bytes;
+		if (output.fade_start < outputbuf->buf) {
+			output.fade_start += outputbuf->size;
+		}
+		output.fade_end = outputbuf->writep;
+	}
+
+	if (start && output.fade_mode == FADE_CROSSFADE && _buf_used(outputbuf) != 0) {
+		if (output.next_sample_rate != output.current_sample_rate) {
+			LOG_INFO("crossfade disabled as sample rates differ");
+			return;
+		}
+		bytes = min(bytes, _buf_used(outputbuf));   // max of current remaining samples from previous track
+		bytes = min(bytes, outputbuf->size * 0.9);  // max of 90% of outputbuf as we consume additional buffer during crossfade
+		LOG_INFO("CROSSFADE: %u frames", bytes / BYTES_PER_FRAME);
+		output.fade = FADE_DUE;
+		output.fade_dir = FADE_CROSS;
+		output.fade_start = outputbuf->writep - bytes;
+		if (output.fade_start < outputbuf->buf) {
+			output.fade_start += outputbuf->size;
+		}
+		output.fade_end = outputbuf->writep;
+		output.track_start = output.fade_start;
+	}
+}
+
 static pthread_t thread;
 
 void output_init(log_level level, const char *device, unsigned output_buf_size, unsigned buffer_time, unsigned period_count) {
@@ -754,6 +905,11 @@ void output_init(log_level level, const char *device, unsigned output_buf_size, 
 	LOG_DEBUG("outputbuf size: %u", output_buf_size);
 
 	buf_init(outputbuf, output_buf_size);
+	if (!outputbuf->buf) {
+		LOG_ERROR("unable to malloc buffer");
+		exit(0);
+	}
+
 	output.state = STOPPED;
 	output.current_sample_rate = 44100;
 	output.device = device;
@@ -762,7 +918,7 @@ void output_init(log_level level, const char *device, unsigned output_buf_size, 
 
 	if (!alsa_testopen(output.device, &output.max_sample_rate)) {
 		LOG_ERROR("unable to open output device");
-		return;
+		exit(0);
 	}
 
 	LOG_INFO("output: %s maxrate: %u", output.device, output.max_sample_rate);
