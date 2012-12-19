@@ -26,6 +26,8 @@
 
 static log_level loglevel;
 
+#define IS_LITTLE_ENDIAN (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+
 #define MAX_SILENCE_FRAMES 1024
 
 // for mmap ouput we convert to LE formats on BE devices as it is likely hardware requires LE
@@ -303,7 +305,10 @@ static void *output_thread() {
 
 		if (!pcmp || alsa.rate != output.current_sample_rate) {
 			LOG_INFO("open output device: %s", output.device);
-			alsa_open(&pcmp, output.device, output.current_sample_rate, output.buffer_time, output.period_count);
+			if (!!alsa_open(&pcmp, output.device, output.current_sample_rate, output.buffer_time, output.period_count)) {
+				sleep(5);
+				continue;
+			}
 			start = true;
 		}
 
@@ -451,7 +456,7 @@ static void *output_thread() {
 		output.alsa_frames = delay;
 		output.updated = gettime_ms();
 
-		s32_t cross_gain_in = 0; s32_t *cross_ptr = NULL;
+		s32_t cross_gain_in = 0, cross_gain_out = 0; s32_t *cross_ptr = NULL;
 
 		while (size > 0) {
 			snd_pcm_uframes_t alsa_frames;
@@ -467,7 +472,9 @@ static void *output_thread() {
 					output.frames_played = 0;
 					output.track_started = true;
 					output.current_sample_rate = output.next_sample_rate;
-					output.current_replay_gain = output.next_replay_gain;
+					if (!output.fade == FADE_ACTIVE || !output.fade_mode == FADE_CROSSFADE) {
+						output.current_replay_gain = output.next_replay_gain;
+					}
 					output.track_start = NULL;
 					break;
 				} else if (output.track_start > outputbuf->readp) {
@@ -510,6 +517,7 @@ static void *output_thread() {
 								LOG_WARN("unable to skip crossfaded start");
 							}
 							output.fade = FADE_NONE;
+							output.current_replay_gain = output.next_replay_gain;
 						} else {
 							LOG_INFO("fade complete");
 							output.fade = FADE_NONE;
@@ -531,8 +539,18 @@ static void *output_thread() {
 						}
 						if (output.fade_dir == FADE_CROSS) {
 							// cross fade requires special treatment - performed later based on these values
+							// support different replay gain for old and new track by retaining old value until crossfade completes
 							if (_buf_used(outputbuf) / BYTES_PER_FRAME > dur_f + size) { 
-								cross_gain_in = to_gain((float)cur_f / (float)dur_f);
+								cross_gain_in  = to_gain((float)cur_f / (float)dur_f);
+								cross_gain_out = FIXED_ONE - cross_gain_in;
+								if (output.current_replay_gain) {
+									cross_gain_out = gain(cross_gain_out, output.current_replay_gain);
+								}
+								if (output.next_replay_gain) {
+									cross_gain_in = gain(cross_gain_in, output.next_replay_gain);
+								}
+								gainL = output.gainL;
+								gainR = output.gainR;
 								cross_ptr = (s32_t *)(output.fade_end + cur_f * BYTES_PER_FRAME);
 							} else {
 								LOG_INFO("unable to continue crossfade - too few samples");
@@ -561,7 +579,6 @@ static void *output_thread() {
 				if (output.fade == FADE_ACTIVE && output.fade_dir == FADE_CROSS) {
 					s32_t *ptr = (s32_t *)(void *)outputbuf->readp;
 					frames_t count = alsa_frames * 2;
-					s32_t cross_gain_out = FIXED_ONE - cross_gain_in;
 					while (count--) {
 						if (cross_ptr > (s32_t *)outputbuf->wrap) {
 							cross_ptr -= outputbuf->size / BYTES_PER_FRAME * 2;
@@ -578,36 +595,35 @@ static void *output_thread() {
 				switch(alsa.format) {
 				case SND_PCM_FORMAT_S16_LE:
 					{
-#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-						s16_t *optr = (s16_t *)(void *)outputptr;
+						u32_t *optr = (u32_t *)(void *)outputptr;
+#if IS_LITTLE_ENDIAN
 						if (gainL == FIXED_ONE && gainR == FIXED_ONE) {
 							while (cnt--) {
-								*(optr++) = *(inputptr++) >> 16;
-								*(optr++) = *(inputptr++) >> 16;
+								*(optr++) = (*(inputptr) & 0xffff0000) | (*(inputptr+1) >> 16 & 0x0000ffff);
+								inputptr += 2;
 							}
 						} else {
 							while (cnt--) {
-								*(optr++) = gain(gainL, *(inputptr++)) >> 16;
-								*(optr++) = gain(gainR, *(inputptr++)) >> 16;
+								*(optr++) = (gain(gainL, *(inputptr)) & 0xffff0000) | (gain(gainR, *(inputptr+1)) >> 16 & 0x0000ffff);
+								inputptr += 2;
 							}
 						}
 #else
-						u8_t *optr = (u8_t *)(void *)outputptr;
 						if (gainL == FIXED_ONE && gainR == FIXED_ONE) {
 							while (cnt--) {
-								*(optr++) = (*(inputptr)   & 0x00ff0000) >> 16;
-								*(optr++) = (*(inputptr++) & 0xff000000) >> 24;
-								*(optr++) = (*(inputptr)   & 0x00ff0000) >> 16;
-								*(optr++) = (*(inputptr++) & 0xff000000) >> 24;
+								s32_t lsample = *(inputptr++);
+								s32_t rsample = *(inputptr++);
+								*(optr++) = 
+									(lsample & 0x00ff0000) << 8 | (lsample & 0xff000000) >> 8 |
+									(rsample & 0x00ff0000) >> 8 | (rsample & 0xff000000) >> 24;
 							}
 						} else {
 							while (cnt--) {
 								s32_t lsample = gain(gainL, *(inputptr++));
 								s32_t rsample = gain(gainR, *(inputptr++));
-								*(optr++) = (lsample & 0x00ff0000) >> 16;
-								*(optr++) = (lsample & 0xff000000) >> 24;
-								*(optr++) = (rsample & 0x00ff0000) >> 16;
-								*(optr++) = (rsample & 0xff000000) >> 24;
+								*(optr++) = 
+									(lsample & 0x00ff0000) << 8 | (lsample & 0xff000000) >> 8 |
+									(rsample & 0x00ff0000) >> 8 | (rsample & 0xff000000) >> 24;
 							}
 						}
 #endif
@@ -615,8 +631,8 @@ static void *output_thread() {
 					break;
 				case SND_PCM_FORMAT_S24_LE: 
 					{
-#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-						s32_t *optr = (s32_t *)(void *)outputptr;
+						u32_t *optr = (u32_t *)(void *)outputptr;
+#if IS_LITTLE_ENDIAN
 						if (gainL == FIXED_ONE && gainR == FIXED_ONE) {
 							while (cnt--) {
 								*(optr++) = *(inputptr++) >> 8;
@@ -629,30 +645,23 @@ static void *output_thread() {
 							}
 						}
 #else
-						u8_t *optr = (u8_t *)(void *)outputptr;
 						if (gainL == FIXED_ONE && gainR == FIXED_ONE) {
 							while (cnt--) {
-								*(optr++) = (*(inputptr)   & 0x0000ff00) >>  8;
-								*(optr++) = (*(inputptr)   & 0x00ff0000) >> 16;
-								*(optr++) = (*(inputptr++) & 0xff000000) >> 24;
-								*(optr++) = 0;
-								*(optr++) = (*(inputptr)   & 0x0000ff00) >>  8;
-								*(optr++) = (*(inputptr)   & 0x00ff0000) >> 16;
-								*(optr++) = (*(inputptr++) & 0xff000000) >> 24;
-								*(optr++) = 0;
+								s32_t lsample = *(inputptr++);
+								s32_t rsample = *(inputptr++);
+								*(optr++) = 
+									(lsample & 0xff000000) >> 16 | (lsample & 0x00ff0000) | (lsample & 0x0000ff00 << 16);
+								*(optr++) = 
+									(rsample & 0xff000000) >> 16 | (rsample & 0x00ff0000) | (rsample & 0x0000ff00 << 16);
 							}
 						} else {
 							while (cnt--) {
 								s32_t lsample = gain(gainL, *(inputptr++));
 								s32_t rsample = gain(gainR, *(inputptr++));
-								*(optr++) = (lsample & 0x0000ff00) >>  8;
-								*(optr++) = (lsample & 0x00ff0000) >> 16;
-								*(optr++) = (lsample & 0xff000000) >> 24;
-								*(optr++) = 0;
-								*(optr++) = (rsample & 0x0000ff00) >>  8;
-								*(optr++) = (rsample & 0x00ff0000) >> 16;
-								*(optr++) = (rsample & 0xff000000) >> 24;
-								*(optr++) = 0;
+								*(optr++) = 
+									(lsample & 0xff000000) >> 16 | (lsample & 0x00ff0000) | (lsample & 0x0000ff00 << 16);
+								*(optr++) = 
+									(rsample & 0xff000000) >> 16 | (rsample & 0x00ff0000) | (rsample & 0x0000ff00 << 16);
 							}
 						}
 #endif
@@ -670,7 +679,7 @@ static void *output_thread() {
 									while (cnt >= 2) {
 										s32_t l1 = *(inputptr++); s32_t r1 = *(inputptr++);
 										s32_t l2 = *(inputptr++); s32_t r2 = *(inputptr++);
-#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#if IS_LITTLE_ENDIAN
 										*(o_ptr++) = (l1 & 0xffffff00) >>  8 | (r1 & 0x0000ff00) << 16;
 										*(o_ptr++) = (r1 & 0xffff0000) >> 16 | (l2 & 0x00ffff00) <<  8;
 										*(o_ptr++) = (l2 & 0xff000000) >> 24 | (r2 & 0xffffff00);
@@ -706,7 +715,7 @@ static void *output_thread() {
 									while (cnt >= 2) {
 										s32_t l1 = gain(gainL, *(inputptr++)); s32_t r1 = gain(gainR, *(inputptr++));
 										s32_t l2 = gain(gainL, *(inputptr++)); s32_t r2 = gain(gainR, *(inputptr++));
-#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#if IS_LITTLE_ENDIAN
 										*(o_ptr++) = (l1 & 0xffffff00) >>  8 | (r1 & 0x0000ff00) << 16;
 										*(o_ptr++) = (r1 & 0xffff0000) >> 16 | (l2 & 0x00ffff00) <<  8;
 										*(o_ptr++) = (l2 & 0xff000000) >> 24 | (r2 & 0xffffff00);
@@ -738,8 +747,8 @@ static void *output_thread() {
 					break;
 				case SND_PCM_FORMAT_S32_LE:
 					{
-#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-						s32_t *optr = (s32_t *)(void *)outputptr;
+						u32_t *optr = (u32_t *)(void *)outputptr;
+#if IS_LITTLE_ENDIAN
 						if (gainL == FIXED_ONE && gainR == FIXED_ONE) {
 							memcpy(outputptr, inputptr, cnt * BYTES_PER_FRAME);
 						} else {
@@ -749,30 +758,27 @@ static void *output_thread() {
 							}
 						}
 #else
-						u8_t *optr = (u8_t *)(void *)outputptr;
 						if (gainL == FIXED_ONE && gainR == FIXED_ONE) {
 							while (cnt--) {
-								*(optr++) = (*(inputptr)   & 0x000000ff);
-								*(optr++) = (*(inputptr)   & 0x0000ff00) >>  8;
-								*(optr++) = (*(inputptr)   & 0x00ff0000) >> 16;
-								*(optr++) = (*(inputptr++) & 0xff000000) >> 24;
-								*(optr++) = (*(inputptr)   & 0x000000ff);
-								*(optr++) = (*(inputptr)   & 0x0000ff00) >>  8;
-								*(optr++) = (*(inputptr)   & 0x00ff0000) >> 16;
-								*(optr++) = (*(inputptr++) & 0xff000000) >> 24;
+								s32_t lsample = *(inputptr++);
+								s32_t rsample = *(inputptr++);
+								*(optr++) = 
+ 									(lsample & 0xff000000) >> 24 | (lsample & 0x00ff0000) >> 8 |
+									(lsample & 0x0000ff00) << 8  | (lsample & 0x000000ff) << 24;
+								*(optr++) = 
+									(rsample & 0xff000000) >> 24 | (rsample & 0x00ff0000) >> 8 |
+									(rsample & 0x0000ff00) << 8  | (rsample & 0x000000ff) << 24;
 							}
 						} else {
 							while (cnt--) {
 								s32_t lsample = gain(gainL, *(inputptr++));
 								s32_t rsample = gain(gainR, *(inputptr++));
-								*(optr++) = (lsample & 0x000000ff);
-								*(optr++) = (lsample & 0x0000ff00) >>  8;
-								*(optr++) = (lsample & 0x00ff0000) >> 16;
-								*(optr++) = (lsample & 0xff000000) >> 24;
-								*(optr++) = (rsample & 0x000000ff);
-								*(optr++) = (rsample & 0x0000ff00) >>  8;
-								*(optr++) = (rsample & 0x00ff0000) >> 16;
-								*(optr++) = (rsample & 0xff000000) >> 24;
+								*(optr++) = 
+ 									(lsample & 0xff000000) >> 24 | (lsample & 0x00ff0000) >> 8 |
+									(lsample & 0x0000ff00) << 8  | (lsample & 0x000000ff) << 24;
+								*(optr++) = 
+									(rsample & 0xff000000) >> 24 | (rsample & 0x00ff0000) >> 8 |
+									(rsample & 0x0000ff00) << 8  | (rsample & 0x000000ff) << 24;
 							}
 						}
 #endif
@@ -793,7 +799,6 @@ static void *output_thread() {
 				if (output.fade == FADE_ACTIVE && output.fade_dir == FADE_CROSS) {
 					s32_t *ptr = (s32_t *)(void *)outputbuf->readp;
 					frames_t count = alsa_frames * 2;
-					s32_t cross_gain_out = FIXED_ONE - cross_gain_in;
 					while (count--) {
 						if (cross_ptr > (s32_t *)outputbuf->wrap) {
 							cross_ptr -= outputbuf->size / BYTES_PER_FRAME * 2;
