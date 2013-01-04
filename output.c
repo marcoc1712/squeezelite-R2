@@ -528,6 +528,7 @@ static void *output_thread(void *arg) {
 			LOCK;
 			output_off = (output.state == OUTPUT_OFF);
 			UNLOCK;
+			if (!running) return 0;
 		}
 
 		// wait until device returns - to allow usb audio devices to be turned off
