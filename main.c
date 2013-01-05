@@ -67,7 +67,6 @@ static void license(void) {
 }
 
 void sighandler(int signum) {
-	LOG_ERROR("signal");
 	slimproto_stop();
 }
 

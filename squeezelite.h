@@ -18,7 +18,7 @@
  *
  */
 
-#define VERSION "v0.9beta2"
+#define VERSION "v0.9beta3"
 
 // build detection
 #if defined(linux)
@@ -188,11 +188,9 @@ typedef BOOL bool;
 #define in_addr_t u32_t
 #define socklen_t int
 
-#define poll WSAPoll // FIXME? - limits support to Vista and later
-
 #define dlopen(x, y) LoadLibrary((LPCTSTR)x)
 #define dlsym(x, y)  (void *)GetProcAddress(x, y)
-#define dlerror()    GetLastError() ? "dlerror" : NULL
+//dlerror implemented in utils.c
 
 #endif
 
@@ -273,6 +271,8 @@ u16_t unpackn(u16_t *src);
 #if WIN
 void winsock_init(void);
 void winsock_close(void);
+char *dlerror(void);
+int poll(struct pollfd *fds, unsigned long numfds, int timeout);
 #endif
 
 // buffer.c
