@@ -222,12 +222,12 @@ static void process_strm(u8_t *pkt, int len) {
 	case 'q':
 		stream_disconnect();
 		buf_flush(streambuf);
-		buf_flush(outputbuf);
+		output_flush();
 		break;
 	case 'f':
 		stream_disconnect();
 		buf_flush(streambuf);
-		buf_flush(outputbuf);
+		output_flush();
 		break;
 	case 'p':
 		{
