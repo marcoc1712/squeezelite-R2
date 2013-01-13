@@ -611,14 +611,14 @@ in_addr_t discover_server(void) {
 			LOG_INFO("error sending disovery");
 		}
 
-		if (poll(&pollinfo, 1, 5000)) {
+		if (poll(&pollinfo, 1, 5000) && running) {
 			char readbuf[10];
 			socklen_t slen = sizeof(s);
 			recvfrom(disc_sock, readbuf, 10, 0, (struct sockaddr *)&s, &slen);
 			LOG_INFO("got response from: %s:%d", inet_ntoa(s.sin_addr), ntohs(s.sin_port));
 		}
 
-	} while (s.sin_addr.s_addr == 0);
+	} while (s.sin_addr.s_addr == 0 && running);
 
 	closesocket(disc_sock);
 
@@ -634,7 +634,11 @@ void slimproto(log_level level, const char *addr, u8_t mac[6], const char *name)
 	wake_create(wake_e);
 
 	loglevel = level;
+	running = true;
+
 	slimproto_ip = addr ? inet_addr(addr) : discover_server();
+
+	if (!running) return;
 
 	LOCK_O;
 	sprintf(fixed_cap, ",MaxSampleRate=%u", output.max_sample_rate); 
@@ -654,7 +658,6 @@ void slimproto(log_level level, const char *addr, u8_t mac[6], const char *name)
 
 	LOG_INFO("connecting to %s:%d", inet_ntoa(serv_addr.sin_addr), ntohs(serv_addr.sin_port));
 
-	running = true;
 	new_server = 0;
 
 	while (running) {
@@ -722,5 +725,6 @@ void slimproto(log_level level, const char *addr, u8_t mac[6], const char *name)
 }
 
 void slimproto_stop(void) {
+	LOG_INFO("slimproto stop");
 	running = false;
 }
