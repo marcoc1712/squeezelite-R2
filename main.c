@@ -78,12 +78,12 @@ static char *next_param(char *src, char c) {
 		ret = str;
 		*ptr = '\0';
 		str = ptr + 1;
-		return ret[0] ? ret : NULL;
 	} else {
 		ret = str;
 		str = NULL;
-		return ret;
 	}
+
+	return ret[0] ? ret : NULL;
 }
 
 int main(int argc, char **argv) {

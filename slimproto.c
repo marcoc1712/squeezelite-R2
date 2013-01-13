@@ -611,7 +611,7 @@ in_addr_t discover_server(void) {
 			LOG_INFO("error sending disovery");
 		}
 
-		if (poll(&pollinfo, 1, 5000) && running) {
+		if (poll(&pollinfo, 1, 5000) == 1) {
 			char readbuf[10];
 			socklen_t slen = sizeof(s);
 			recvfrom(disc_sock, readbuf, 10, 0, (struct sockaddr *)&s, &slen);
