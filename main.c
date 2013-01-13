@@ -83,7 +83,7 @@ static char *next_param(char *src, char c) {
 		str = NULL;
 	}
 
-	return ret[0] ? ret : NULL;
+	return ret && ret[0] ? ret : NULL;
 }
 
 int main(int argc, char **argv) {
