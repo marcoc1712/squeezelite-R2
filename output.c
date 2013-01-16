@@ -1302,6 +1302,8 @@ void output_init(log_level level, const char *device, unsigned output_buf_size, 
 	output.latency = latency;
 	pa.stream = NULL;
 
+	LOG_INFO("requested latency: %u", output.latency);
+
  	if ((err = Pa_Initialize()) != paNoError) {
 		LOG_WARN("error initialising port audio: %s", Pa_GetErrorText(err));
 		return;
