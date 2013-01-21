@@ -18,7 +18,7 @@
  *
  */
 
-#define VERSION "v0.9beta8"
+#define VERSION "v0.9beta9"
 
 // build detection
 #if defined(linux)
@@ -374,7 +374,7 @@ struct outputstate {
 	bool  track_started; 
 #if PORTAUDIO
 	bool  pa_reopen;
-	double latency;
+	unsigned latency;
 #endif
 	unsigned frames_played;
 	unsigned current_sample_rate;
