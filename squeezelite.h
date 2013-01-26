@@ -190,6 +190,7 @@ typedef BOOL bool;
 
 #define in_addr_t u32_t
 #define socklen_t int
+#define ssize_t int
 
 #define RTLD_NOW 0
 
