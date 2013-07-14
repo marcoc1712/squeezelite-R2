@@ -376,8 +376,7 @@ struct processstate {
 	u8_t *inbuf, *outbuf;
 	unsigned max_in_frames, max_out_frames;
 	unsigned in_frames, out_frames;
-	unsigned sample_factor;
-	unsigned sample_rate;
+	unsigned in_sample_rate, out_sample_rate;
 	unsigned long total_in, total_out;
 };
 #endif

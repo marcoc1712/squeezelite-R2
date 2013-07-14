@@ -378,7 +378,7 @@ void list_devices(void) {
 
 	printf("Output devices:\n");
 	for (i = 0; i < Pa_GetDeviceCount(); ++i) {
-		printf("  %i - %s\n", i, Pa_GetDeviceInfo(i)->name);
+		printf("  %i - %s [%s]\n", i, Pa_GetDeviceInfo(i)->name, Pa_GetHostApiInfo(Pa_GetDeviceInfo(i)->hostApi)->name);
 	}
 	printf("\n");
 
