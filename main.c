@@ -34,7 +34,11 @@ static void usage(const char *argv0) {
 		   "  -a <b>:<p>:<f>:<m>\tSpecify ALSA params to open output device, b = buffer time in ms or size in bytes, p = period count or size in bytes, f sample format (16|24|24_3|32), m = use mmap (0|1)\n"
 #endif
 #if PORTAUDIO
-		   "  -a <latency>\t\tSpecify output target latency in ms\n"
+#if MAC
+		   "  -a <l>:<r>\t\tSpecify Portaudio params to open output device, l = target latency in ms, r = allow OSX to resample (0|1)\n"
+#else
+		   "  -a <l>\t\tSpecify Portaudio params to open output device, l = target latency in ms\n"
+#endif
 #endif
 		   "  -b <stream>:<output>\tSpecify internal Stream and Output buffer sizes in Kbytes\n"
 		   "  -c <codec1>,<codec2>\tRestrict codecs to those specified, otherwise load all available codecs; known codecs: flac,pcm,mp3,ogg,aac (mad,mpg for specific mp3 codec)\n"
@@ -109,6 +113,7 @@ int main(int argc, char **argv) {
 #endif
 #if PORTAUDIO
 	unsigned pa_latency = 0;
+	int pa_osx_playnice = -1;
 #endif
 	
 	log_level log_output = lWARN;
@@ -155,7 +160,10 @@ int main(int argc, char **argv) {
 				if (m) alsa_mmap = atoi(m);
 #endif
 #if PORTAUDIO
-				pa_latency = (unsigned)atoi(optarg);
+				char *l = next_param(optarg, ':');
+				char *p = next_param(NULL, ':');
+				if (l) pa_latency = (unsigned)atoi(l);
+				if (p) pa_osx_playnice = atoi(p);
 #endif
 			}
 			break;
@@ -289,7 +297,7 @@ int main(int argc, char **argv) {
 				max_rate, rt_priority);
 #endif
 #if PORTAUDIO
-	output_init(log_output, output_device, output_buf_size, pa_latency, max_rate);
+	output_init(log_output, output_device, output_buf_size, pa_latency, pa_osx_playnice, max_rate);
 #endif
 
 	decode_init(log_decode, codecs);

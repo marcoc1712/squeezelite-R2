@@ -394,7 +394,7 @@ static int pa_device_id(const char *device) {
 	if (!strncmp(device, "default", 7)) {
 		return Pa_GetDefaultOutputDevice();
 	}
-	if (len >= 1 && len <= 2 && device[0] > '0' && device[0] <= '9') {
+	if (len >= 1 && len <= 2 && device[0] >= '0' && device[0] <= '9') {
 		return atoi(device);
 	}
 
@@ -512,11 +512,13 @@ void _pa_open(void) {
 		outputParameters.hostApiSpecificStreamInfo = NULL;
 		
 #if OSX
-		// enable pro mode which aims to avoid resampling if possible for non built in devices
-		// see http://code.google.com/p/squeezelite/issues/detail?id=11 for reason for not doing with built in device
+		// enable pro mode which aims to avoid resampling if possible
+		// see http://code.google.com/p/squeezelite/issues/detail?id=11 & http://code.google.com/p/squeezelite/issues/detail?id=37
+		// command line controls osx_playnice which is -1 if not specified, 0 or 1
 		PaMacCoreStreamInfo macInfo;
 		unsigned long streamInfoFlags;
-	 	if (!strcmp(Pa_GetDeviceInfo(outputParameters.device)->name, "Built-in Output")) {
+	 	if (output.osx_playnice == 1 || 
+			(output.osx_playnice == -1 && !strcmp(Pa_GetDeviceInfo(outputParameters.device)->name, "Built-in Output"))) {
 			LOG_INFO("opening device in PlayNice mode");
 			streamInfoFlags = paMacCorePlayNice;
 		} else {
@@ -1329,7 +1331,7 @@ void output_init(log_level level, const char *device, unsigned output_buf_size, 
 				 const char *alsa_sample_fmt, bool mmap, unsigned max_rate, unsigned rt_priority) {
 #endif
 #if PORTAUDIO
-void output_init(log_level level, const char *device, unsigned output_buf_size, unsigned latency, unsigned max_rate) {
+	void output_init(log_level level, const char *device, unsigned output_buf_size, unsigned latency, int osx_playnice, unsigned max_rate) {
 	PaError err;
 #endif
 	loglevel = level;
@@ -1376,6 +1378,7 @@ void output_init(log_level level, const char *device, unsigned output_buf_size, 
 
 #if PORTAUDIO
 	output.latency = latency;
+	output.osx_playnice = osx_playnice;
 	pa.stream = NULL;
 
 	LOG_INFO("requested latency: %u", output.latency);

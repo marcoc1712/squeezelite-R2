@@ -434,6 +434,7 @@ struct outputstate {
 #if PORTAUDIO
 	bool  pa_reopen;
 	unsigned latency;
+	int osx_playnice;
 #endif
 	unsigned frames_played;
 	unsigned current_sample_rate;
@@ -465,7 +466,7 @@ void list_devices(void);
 void output_init(log_level level, const char *device, unsigned output_buf_size, unsigned alsa_buffer, unsigned alsa_period, const char *alsa_sample_fmt, bool mmap, unsigned max_rate, unsigned rt_priority);
 #endif
 #if PORTAUDIO
-void output_init(log_level level, const char *device, unsigned output_buf_size, unsigned latency, unsigned max_rate);
+void output_init(log_level level, const char *device, unsigned output_buf_size, unsigned latency, int osx_playnice, unsigned max_rate);
 #endif
 void output_flush(void);
 void output_close(void);
