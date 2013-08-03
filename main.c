@@ -34,7 +34,7 @@ static void usage(const char *argv0) {
 		   "  -a <b>:<p>:<f>:<m>\tSpecify ALSA params to open output device, b = buffer time in ms or size in bytes, p = period count or size in bytes, f sample format (16|24|24_3|32), m = use mmap (0|1)\n"
 #endif
 #if PORTAUDIO
-#if MAC
+#if OSX
 		   "  -a <l>:<r>\t\tSpecify Portaudio params to open output device, l = target latency in ms, r = allow OSX to resample (0|1)\n"
 #else
 		   "  -a <l>\t\tSpecify Portaudio params to open output device, l = target latency in ms\n"
