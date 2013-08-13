@@ -140,6 +140,7 @@
 #define thread_t pthread_t;
 #define closesocket(s) close(s)
 #define last_error() errno
+#define ERROR_WOULDBLOCK EWOULDBLOCK
 
 typedef u_int8_t  u8_t;
 typedef u_int16_t u16_t;
@@ -194,6 +195,7 @@ typedef BOOL bool;
 #define usleep(x) Sleep(x/1000)
 #define sleep(x) Sleep(x*1000)
 #define last_error() WSAGetLastError()
+#define ERROR_WOULDBLOCK WSAEWOULDBLOCK
 #define open _open
 #define read _read
 

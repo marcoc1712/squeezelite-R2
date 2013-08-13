@@ -46,7 +46,7 @@ static void send_header(void) {
 	while (len) {
 		n = send(fd, ptr, len, MSG_NOSIGNAL);
 		if (n <= 0) {
-			if (n < 0 && last_error() == EAGAIN && try < 10) {
+			if (n < 0 && last_error() == ERROR_WOULDBLOCK && try < 10) {
 				LOG_SDEBUG("retrying (%d) writing to socket", ++try);
 				usleep(1000);
 				continue;
@@ -125,7 +125,7 @@ static void *stream_thread() {
 
 					int n = recv(fd, &c, 1, 0);
 					if (n <= 0) {
-						if (n < 0 && last_error() == EAGAIN) {
+						if (n < 0 && last_error() == ERROR_WOULDBLOCK) {
 							UNLOCK;
 							continue;
 						}
@@ -167,7 +167,7 @@ static void *stream_thread() {
 						u8_t c;
 						int n = recv(fd, &c, 1, 0);
 						if (n <= 0) {
-							if (n < 0 && last_error() == EAGAIN) {
+							if (n < 0 && last_error() == ERROR_WOULDBLOCK) {
 								UNLOCK;
 								continue;
 							}
@@ -184,7 +184,7 @@ static void *stream_thread() {
 					if (stream.meta_left) {
 						int n = recv(fd, stream.header + stream.header_len, stream.meta_left, 0);
 						if (n <= 0) {
-							if (n < 0 && last_error() == EAGAIN) {
+							if (n < 0 && last_error() == ERROR_WOULDBLOCK) {
 								UNLOCK;
 								continue;
 							}
@@ -223,7 +223,7 @@ static void *stream_thread() {
 						LOG_INFO("end of stream");
 						_disconnect(DISCONNECT, DISCONNECT_OK);
 					}
-					if (n < 0 && last_error() != EAGAIN) {
+					if (n < 0 && last_error() != ERROR_WOULDBLOCK) {
 						LOG_INFO("error reading: %s", strerror(last_error()));
 						_disconnect(DISCONNECT, REMOTE_DISCONNECT);
 					}
