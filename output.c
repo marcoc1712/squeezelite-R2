@@ -467,22 +467,38 @@ static thread_type probe_thread;
 bool probe_thread_running = false;
 
 static void *pa_probe() {
-	// this is a hack to partially support hot plugging of devices
-	// we rely on terminating and reinitalising PA to get an updated list of devices and use name for output.device
+	bool output_off;
+	LOCK;
+	output_off = (output.state == OUTPUT_OFF);
+	UNLOCK;
+
 	while (probe_thread_running) {
-		LOG_INFO("probing device %s", output.device);
 		LOCK;
-		Pa_Terminate();
-		Pa_Initialize();
-		pa.stream = NULL;
-		if (pa_device_id(output.device) != -1) {
-			LOG_INFO("found");
-			probe_thread_running = false;
-			_pa_open();
+		if (output_off) {
+			if (output.state != OUTPUT_OFF) {
+				LOG_INFO("output on");
+				probe_thread_running = false;
+				pa.stream = NULL;
+				_pa_open();
+			}
 		} else {
-			sleep(5);
+			// this is a hack to partially support hot plugging of devices
+			// we rely on terminating and reinitalising PA to get an updated list of devices and use name for output.device
+			LOG_INFO("probing device %s", output.device);
+			Pa_Terminate();
+			Pa_Initialize();
+			pa.stream = NULL;
+			if (pa_device_id(output.device) != -1) {
+				LOG_INFO("device reopen");
+				probe_thread_running = false;
+				_pa_open();
+			}
 		}
 		UNLOCK;
+
+		if (probe_thread_running) {
+			sleep(output_off ? 1 : 5);
+		}
 	}
 
 	return 0;
@@ -514,11 +530,10 @@ void _pa_open(void) {
 #if OSX
 		// enable pro mode which aims to avoid resampling if possible
 		// see http://code.google.com/p/squeezelite/issues/detail?id=11 & http://code.google.com/p/squeezelite/issues/detail?id=37
-		// command line controls osx_playnice which is -1 if not specified, 0 or 1
+		// command line controls osx_playnice which is -1 if not specified, 0 or 1 - choose playnice if -1 or 1
 		PaMacCoreStreamInfo macInfo;
 		unsigned long streamInfoFlags;
-	 	if (output.osx_playnice == 1 || 
-			(output.osx_playnice == -1 && !strcmp(Pa_GetDeviceInfo(outputParameters.device)->name, "Built-in Output"))) {
+	 	if (output.osx_playnice) {
 			LOG_INFO("opening device in PlayNice mode");
 			streamInfoFlags = paMacCorePlayNice;
 		} else {
@@ -530,14 +545,14 @@ void _pa_open(void) {
 #endif
 	}
 
-	if (!err && 
+	if (!err && output.state != OUTPUT_OFF &&
 		(err = Pa_OpenStream(&pa.stream, NULL, &outputParameters, (double)output.current_sample_rate, paFramesPerBufferUnspecified,
 							 paPrimeOutputBuffersUsingStreamCallback | paDitherOff, pa_callback, NULL)) != paNoError) {
 		LOG_WARN("error opening device %i - %s : %s", outputParameters.device, Pa_GetDeviceInfo(outputParameters.device)->name, 
 				 Pa_GetErrorText(err));
 	}
 
-	if (!err) {
+	if (!err && output.state != OUTPUT_OFF) {
 		LOG_INFO("opened device %i - %s at %u latency %u ms", outputParameters.device, Pa_GetDeviceInfo(outputParameters.device)->name,
 				 (unsigned int)Pa_GetStreamInfo(pa.stream)->sampleRate, (unsigned int)(Pa_GetStreamInfo(pa.stream)->outputLatency * 1000));
 
@@ -552,7 +567,7 @@ void _pa_open(void) {
 		}
 	}
 
-	if (err && !probe_thread_running) {
+	if ((err || output.state == OUTPUT_OFF) && !probe_thread_running) {
 		// create a thread to probe for the device
 #if LINUX || OSX
 		pthread_create(&probe_thread, NULL, pa_probe, NULL);
@@ -1253,7 +1268,11 @@ static void *output_thread(void *arg) {
 	   		memset(optr, 0, (pa_frames_wanted - frames) * BYTES_PER_FRAME);
 		}
 
-		if (pa.rate != output.current_sample_rate) {
+		if (output.state == OUTPUT_OFF) {
+			LOG_INFO("output off");
+			UNLOCK;
+			return paComplete;
+		} else if (pa.rate != output.current_sample_rate) {
 			UNLOCK;
 			return paComplete;
 		} else {
