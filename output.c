@@ -515,9 +515,15 @@ void _pa_open(void) {
 		}
 	}
 
-	if ((device_id = pa_device_id(output.device)) == -1) {
+	if (output.state == OUTPUT_OFF) {
+		// we get called when transitioning to OUTPUT_OFF to create the probe thread
+		// set err to avoid opening device and logging messages
+		err = 1;
+
+	} else if ((device_id = pa_device_id(output.device)) == -1) {
 		LOG_INFO("device %s not found", output.device);
 		err = 1;
+
 	} else {
 
 		outputParameters.device = device_id;
@@ -545,14 +551,14 @@ void _pa_open(void) {
 #endif
 	}
 
-	if (!err && output.state != OUTPUT_OFF &&
+	if (!err &&
 		(err = Pa_OpenStream(&pa.stream, NULL, &outputParameters, (double)output.current_sample_rate, paFramesPerBufferUnspecified,
 							 paPrimeOutputBuffersUsingStreamCallback | paDitherOff, pa_callback, NULL)) != paNoError) {
 		LOG_WARN("error opening device %i - %s : %s", outputParameters.device, Pa_GetDeviceInfo(outputParameters.device)->name, 
 				 Pa_GetErrorText(err));
 	}
 
-	if (!err && output.state != OUTPUT_OFF) {
+	if (!err) {
 		LOG_INFO("opened device %i - %s at %u latency %u ms", outputParameters.device, Pa_GetDeviceInfo(outputParameters.device)->name,
 				 (unsigned int)Pa_GetStreamInfo(pa.stream)->sampleRate, (unsigned int)(Pa_GetStreamInfo(pa.stream)->outputLatency * 1000));
 
@@ -567,7 +573,7 @@ void _pa_open(void) {
 		}
 	}
 
-	if ((err || output.state == OUTPUT_OFF) && !probe_thread_running) {
+	if (err && !probe_thread_running) {
 		// create a thread to probe for the device
 #if LINUX || OSX
 		pthread_create(&probe_thread, NULL, pa_probe, NULL);
