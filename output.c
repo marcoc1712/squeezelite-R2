@@ -429,12 +429,20 @@ static bool test_open(const char *device, u32_t *max_rate) {
 	outputParameters.hostApiSpecificStreamInfo = NULL;
 
 	// check supported sample rates
-	// Note this does not appear to work on OSX - it always returns paNoError...
+	// Note use Pa_OpenStream as it appears more reliable than Pa_OpenStream on some windows apis
 	for (i = 0; rates[i]; ++i) {
-		if (Pa_IsFormatSupported(NULL, &outputParameters, (double)rates[i]) == paNoError) {
+		err = Pa_OpenStream(&pa.stream, NULL, &outputParameters, (double)rates[i], paFramesPerBufferUnspecified, paNoFlag, 
+							pa_callback, NULL);
+		if (err == paNoError) {
+			Pa_CloseStream(pa.stream);
 			*max_rate = rates[i];
 			break;
 		}
+	}
+
+	if (!rates[i]) {
+		LOG_WARN("no available rate found");
+		return false;
 	}
 
 	if ((err = Pa_OpenStream(&pa.stream, NULL, &outputParameters, (double)*max_rate, paFramesPerBufferUnspecified,
