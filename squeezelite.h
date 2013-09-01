@@ -68,7 +68,16 @@
 #define RESAMPLE  1 // resampling
 #define PROCESS   1 // any sample processing (only resampling at present)
 #else
+#define RESAMPLE  0
 #define PROCESS   0
+#endif
+
+#if LINUX && defined(FFMPEG)
+#undef FFMPEG
+#define FFMPEG    1 // ffmpeg only supported on linux at present
+#else
+#undef FFMPEG
+#define FFMPEG    0
 #endif
 
 // dynamically loaded libraries
@@ -477,7 +486,7 @@ void _checkfade(bool);
 void _pa_open(void);
 
 // codecs
-#define MAX_CODECS 6
+#define MAX_CODECS 8
 
 struct codec *register_flac(void);
 struct codec *register_pcm(void);
@@ -485,3 +494,4 @@ struct codec *register_mad(void);
 struct codec *register_mpg(void);
 struct codec *register_vorbis(void);
 struct codec *register_faad(void);
+struct codec *register_ff(const char *codec);
