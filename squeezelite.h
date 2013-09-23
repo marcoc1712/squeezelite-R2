@@ -72,9 +72,9 @@
 #define PROCESS   0
 #endif
 
-#if LINUX && defined(FFMPEG)
+#if defined(FFMPEG) && !WIN
 #undef FFMPEG
-#define FFMPEG    1 // ffmpeg only supported on linux at present
+#define FFMPEG    1
 #else
 #undef FFMPEG
 #define FFMPEG    0
@@ -88,6 +88,9 @@
 #define LIBVORBIS "libvorbisfile.so.3"
 #define LIBTREMOR "libvorbisidec.so.1"
 #define LIBFAAD "libfaad.so.2"
+#define LIBAVUTIL   "libavutil.so.%d"
+#define LIBAVCODEC  "libavcodec.so.%d"
+#define LIBAVFORMAT "libavformat.so.%d"
 #endif
 
 #if OSX
@@ -97,6 +100,9 @@
 #define LIBVORBIS "libvorbisfile.3.dylib"
 #define LIBTREMOR "libvorbisidec.1.dylib"
 #define LIBFAAD "libfaad.2.dylib"
+#define LIBAVUTIL   "libavutil.%d.dylib"
+#define LIBAVCODEC  "libavcodec.%d.dylib"
+#define LIBAVFORMAT "libavformat.%d.dylib"
 #endif
 
 #if WIN
