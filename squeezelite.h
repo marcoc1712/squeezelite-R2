@@ -72,7 +72,7 @@
 #define PROCESS   0
 #endif
 
-#if defined(FFMPEG) && !WIN
+#if defined(FFMPEG)
 #undef FFMPEG
 #define FFMPEG    1
 #else
@@ -112,6 +112,9 @@
 #define LIBVORBIS "libvorbisfile.dll"
 #define LIBTREMOR "libvorbisidec.dll"
 #define LIBFAAD "libfaad2.dll"
+#define LIBAVUTIL   "avutil-%d.dll"
+#define LIBAVCODEC  "avcodec-%d.dll"
+#define LIBAVFORMAT "avformat-%d.dll"
 #endif
 
 // config options
