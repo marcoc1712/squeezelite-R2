@@ -80,6 +80,14 @@
 #define FFMPEG    0
 #endif
 
+#if LINUX && defined(VISEXPORT)
+#undef VISEXPORT
+#define VISEXPORT 1 // visulizer export support uses linux shared memory
+#else
+#undef VISEXPORT
+#define VISEXPORT 0
+#endif
+
 // dynamically loaded libraries
 #if LINUX
 #define LIBFLAC "libFLAC.so.8"
@@ -487,6 +495,9 @@ void output_init(log_level level, const char *device, unsigned output_buf_size, 
 #endif
 #if PORTAUDIO
 void output_init(log_level level, const char *device, unsigned output_buf_size, unsigned latency, int osx_playnice, unsigned max_rate);
+#endif
+#if VISEXPORT
+void output_vis_init(u8_t *mac);
 #endif
 void output_flush(void);
 void output_close(void);

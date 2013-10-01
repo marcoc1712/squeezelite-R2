@@ -1,5 +1,5 @@
 # Make with portaudio rather than direct alsa
-OPTS = -DPORTAUDIO
+OPTS += -DPORTAUDIO
 LDFLAGS = -lportaudio -lpthread -ldl -lrt
 EXECUTABLE = squeezelite-pa
 
