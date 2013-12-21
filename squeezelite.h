@@ -369,7 +369,7 @@ void buf_init(struct buffer *buf, size_t size);
 void buf_destroy(struct buffer *buf);
 
 // slimproto.c
-void slimproto(log_level level, char *server, u8_t mac[6], const char *name);
+void slimproto(log_level level, char *server, u8_t mac[6], const char *name, const char *namefile);
 void slimproto_stop(void);
 void wake_controller(void);
 

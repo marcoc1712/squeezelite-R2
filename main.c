@@ -51,6 +51,7 @@ static void usage(const char *argv0) {
 		   "  -f <logfile>\t\tWrite debug to logfile\n"
 		   "  -m <mac addr>\t\tSet mac address, format: ab:cd:ef:12:34:56\n"
 		   "  -n <name>\t\tSet the player name\n"
+		   "  -N <filename>\t\tStore player name in filename to allow server defined name changes to be shared between servers (not suppored with -n)\n"
 #if ALSA
 		   "  -p <priority>\t\tSet real time priority of output thread (1-99)\n"
 #endif
@@ -138,6 +139,7 @@ int main(int argc, char **argv) {
 	char *output_device = "default";
 	char *codecs = NULL;
 	char *name = NULL;
+	char *namefile = NULL;
 	char *logfile = NULL;
 	u8_t mac[6];
 	unsigned stream_buf_size = STREAMBUF_SIZE;
@@ -174,7 +176,7 @@ int main(int argc, char **argv) {
 
 	while (optind < argc && strlen(argv[optind]) >= 2 && argv[optind][0] == '-') {
 		char *opt = argv[optind] + 1;
-		if (strstr("oabcdfmnprs", opt) && optind < argc - 1) {
+		if (strstr("oabcdfmnNprs", opt) && optind < argc - 1) {
 			optarg = argv[optind + 1];
 			optind += 2;
 		} else if (strstr("ltz"
@@ -268,6 +270,9 @@ int main(int argc, char **argv) {
 			break;
 		case 'n':
 			name = optarg;
+			break;
+		case 'N':
+			namefile = optarg;
 			break;
 #if ALSA
 		case 'p':
@@ -368,7 +373,12 @@ int main(int argc, char **argv) {
 	}
 #endif
 
-	slimproto(log_slimproto, server, mac, name);
+	if (name && namefile) {
+		printf("-n and -N option should not be used at same time\n");
+		exit(0);
+	}
+
+	slimproto(log_slimproto, server, mac, name, namefile);
 	
 	decode_close();
 	stream_close();
