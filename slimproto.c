@@ -759,7 +759,7 @@ void slimproto(log_level level, char *server, u8_t mac[6], const char *name, con
 	if (!running) return;
 
 	LOCK_O;
-	sprintf(fixed_cap, ",MaxSampleRate=%u", output.max_sample_rate); 
+	sprintf(fixed_cap, ",MaxSampleRate=%u", output.supported_rates[0]); 
 	
 	for (i = 0; i < MAX_CODECS; i++) {
 		if (codecs[i] && codecs[i]->id && strlen(fixed_cap) < 128 - 10) {

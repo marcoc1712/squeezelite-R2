@@ -28,7 +28,7 @@ static void usage(const char *argv0) {
 	printf(TITLE " See -t for license terms\n"
 		   "Usage: %s [options]\n"
 		   "  -s <server>[:<port>]\tConnect to specified server, otherwise uses autodiscovery to find server\n"
-		   "  -o <output device>\tSpecify output device, default \"default\"\n"
+		   "  -o <output device>\tSpecify output device, default \"default\", - = output to stdout\n"
 		   "  -l \t\t\tList output devices\n"
 #if ALSA
 		   "  -a <b>:<p>:<f>:<m>\tSpecify ALSA params to open output device, b = buffer time in ms or size in bytes, p = period count or size in bytes, f sample format (16|24|24_3|32), m = use mmap (0|1)\n"
@@ -40,6 +40,7 @@ static void usage(const char *argv0) {
 		   "  -a <l>\t\tSpecify Portaudio params to open output device, l = target latency in ms\n"
 #endif
 #endif
+		   "  -a <f>\t\tSpecify sample format (16|24|32) of output file when using -o - to output samples to stdout (interleaved little endian only)\n"
 		   "  -b <stream>:<output>\tSpecify internal Stream and Output buffer sizes in Kbytes\n"
 		   "  -c <codec1>,<codec2>\tRestrict codecs to those specified, otherwise load all available codecs; known codecs: "
 #if FFMPEG
@@ -55,16 +56,19 @@ static void usage(const char *argv0) {
 #if ALSA
 		   "  -p <priority>\t\tSet real time priority of output thread (1-99)\n"
 #endif
-		   "  -r <rate>\t\tMax sample rate for output device, enables output device to be off when squeezelite is started\n"
+		   "  -r <rates>\t\tSpecify sample rates supported by device, enables output device to be off when squeezelite is started; rates = <maxrate> | <minrate>-<maxrate> | <rate1>,<rate2>,<rate3>\n"
 #if RESAMPLE
-		   "  -u [params]\t\tUpsample, params = <recipe>:<flags>:<attenuation>:<precision>:<passband_end>:<stopband_start>:<phase_response>,\n" 
-		   "  \t\t\t recipe = (v|h|m|l|q)(|L|I|M)(|s), (|X) = async - resample to max rate for device, otherwise resample to max sync rate\n"
+		   "  -R -u [params]\tResample, params = <recipe>:<flags>:<attenuation>:<precision>:<passband_end>:<stopband_start>:<phase_response>,\n" 
+		   "  \t\t\t recipe = (v|h|m|l|q)(L|I|M)(s) [E|X], E = exception - resample only if native rate not supported, X = async - resample to max rate for device, otherwise to max sync rate\n"
 		   "  \t\t\t flags = num in hex,\n"
 		   "  \t\t\t attenuation = attenuation in dB to apply (default is -1db if not explicitly set),\n"
 		   "  \t\t\t precision = number of bits precision (NB. HQ = 20. VHQ = 28),\n"
 		   "  \t\t\t passband_end = number in percent (0dB pt. bandwidth to preserve. nyquist = 100%%),\n"
 		   "  \t\t\t stopband_start = number in percent (Aliasing/imaging control. > passband_end),\n"
 		   "  \t\t\t phase_response = 0-100 (0 = minimum / 50 = linear / 100 = maximum)\n"
+#endif
+#if DSD
+		   "  -D\t\t\tOutput device supports DSD over PCM (DoP)\n" 
 #endif
 #if VISEXPORT
 		   "  -v \t\t\tVisulizer support\n"
@@ -74,15 +78,15 @@ static void usage(const char *argv0) {
 #endif
 		   "  -t \t\t\tLicense terms\n"
 		   "\n"
-		   "Build options: "
+		   "Build options:"
 #if LINUX
-		   "LINUX"
+		   " LINUX"
 #endif
 #if WIN
-		   "WIN"
+		   " WIN"
 #endif
 #if OSX
-		   "OSX"
+		   " OSX"
 #endif
 #if ALSA
 		   " ALSA"
@@ -108,6 +112,12 @@ static void usage(const char *argv0) {
 #if VISEXPORT
 		   " VISEXPORT"
 #endif
+#if DSD
+		   " DSD"
+#endif
+#if LINKALL
+		   " LINKALL"
+#endif
 		   "\n\n",
 		   argv0);
 }
@@ -124,6 +134,10 @@ static void license(void) {
 		   "GNU General Public License for more details.\n\n"
 		   "You should have received a copy of the GNU General Public License\n"
 		   "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n"
+#if DSD		   
+		   "Contains dsd2pcm library Copyright 2009, 2011 Sebastian Gesemann which\n"
+		   "is subject to its own license.\n\n"
+#endif
 		   );
 }
 
@@ -144,21 +158,17 @@ int main(int argc, char **argv) {
 	u8_t mac[6];
 	unsigned stream_buf_size = STREAMBUF_SIZE;
 	unsigned output_buf_size = 0; // set later
-	unsigned max_rate = 0;
-	char *upsample = NULL;
+	unsigned rates[MAX_SUPPORTED_SAMPLERATES] = { 0 };
+	char *resample = NULL;
+	char *output_params = NULL;
 #if LINUX
 	bool daemonize = false;
 #endif
 #if ALSA
-	unsigned alsa_buffer = ALSA_BUFFER_TIME;
-	unsigned alsa_period = ALSA_PERIOD_COUNT;
-	char *alsa_sample_fmt = NULL;
-	bool alsa_mmap = true;
 	unsigned rt_priority = OUTPUT_RT_PRIORITY;
 #endif
-#if PORTAUDIO
-	unsigned pa_latency = 0;
-	int pa_osx_playnice = -1;
+#if DSD
+	bool dop = false;
 #endif
 #if VISEXPORT
 	bool visexport = false;
@@ -181,7 +191,10 @@ int main(int argc, char **argv) {
 			optind += 2;
 		} else if (strstr("ltz"
 #if RESAMPLE
-						  "u"
+						  "uR"
+#endif
+#if DSD
+						  "D"
 #endif
 #if VISEXPORT
 						  "v"
@@ -198,25 +211,8 @@ int main(int argc, char **argv) {
         case 'o':
             output_device = optarg;
             break;
-		case 'a': 
-			{
-#if ALSA				
-				char *t = next_param(optarg, ':');
-				char *c = next_param(NULL, ':');
-				char *s = next_param(NULL, ':');
-				char *m = next_param(NULL, ':');
-				if (t) alsa_buffer = atoi(t);
-				if (c) alsa_period = atoi(c);
-				if (s) alsa_sample_fmt = s;
-				if (m) alsa_mmap = atoi(m);
-#endif
-#if PORTAUDIO
-				char *l = next_param(optarg, ':');
-				char *p = next_param(NULL, ':');
-				if (l) pa_latency = (unsigned)atoi(l);
-				if (p) pa_osx_playnice = atoi(p);
-#endif
-			}
+		case 'a':
+			output_params = optarg;
 			break;
 		case 'b': 
 			{
@@ -263,7 +259,40 @@ int main(int argc, char **argv) {
 			}
 			break;
 		case 'r':
-			max_rate = atoi(optarg);
+			if (strstr(optarg,",")) {
+				// parse sample rates and sort them
+				char *r = next_param(optarg, ',');
+				unsigned tmp[MAX_SUPPORTED_SAMPLERATES] = { 0 };
+				int i, j;
+				int last = 999999;
+				for (i = 0; r && i < MAX_SUPPORTED_SAMPLERATES; ++i) { 
+					tmp[i] = atoi(r);
+					r = next_param(NULL, ',');
+				}
+				for (i = 0; i < MAX_SUPPORTED_SAMPLERATES; ++i) {
+					int largest = 0;
+					for (j = 0; j < MAX_SUPPORTED_SAMPLERATES; ++j) {
+						if (tmp[j] > largest && tmp[j] < last) {
+							largest = tmp[j];
+						}
+					}
+					rates[i] = last = largest;
+				}
+			} else {
+				// optstr is <max>-<min> or <max>, extract rates from test rates within this range
+				unsigned ref[] TEST_RATES;
+				char *maxstr = next_param(optarg, '-');
+				char *minstr = next_param(NULL, '-');
+				unsigned max = maxstr ? atoi(maxstr) : ref[0];
+				unsigned min = minstr ? atoi(minstr) : 0;
+				int i, j;
+				rates[0] = max;
+				for (i = 0, j = 1; i < MAX_SUPPORTED_SAMPLERATES; ++i) {
+					if (ref[i] < rates[j-1] && ref[i] >= min) {
+						rates[j++] = ref[i];
+					}
+				}
+			}
 			break;
 		case 's':
 			server = optarg;
@@ -289,11 +318,17 @@ int main(int argc, char **argv) {
 			break;
 #if RESAMPLE
 		case 'u':
+		case 'R':
 			if (optind < argc && argv[optind] && argv[optind][0] != '-') {
-				upsample = argv[optind++];
+				resample = argv[optind++];
 			} else {
-				upsample = "";
+				resample = "";
 			}
+			break;
+#endif
+#if DSD
+		case 'D':
+			dop = true;
 			break;
 #endif
 #if VISEXPORT
@@ -323,11 +358,17 @@ int main(int argc, char **argv) {
 	signal(SIGHUP, sighandler);
 #endif
 
-	// set the output buffer size if not specified on the command line to take account of upsampling
+	// set the output buffer size if not specified on the command line, take account of resampling
 	if (!output_buf_size) {
 		output_buf_size = OUTPUTBUF_SIZE;
-		if (upsample) {
-			output_buf_size *= max_rate ? max_rate / 44100 : 8;
+		if (resample) {
+			unsigned scale = 8;
+			if (rates[0]) {
+				scale = rates[0] / 44100;
+				if (scale > 8) scale = 8;
+				if (scale < 1) scale = 1;
+			}
+			output_buf_size *= scale;
 		}
 	}
 
@@ -351,25 +392,32 @@ int main(int argc, char **argv) {
 
 	stream_init(log_stream, stream_buf_size);
 
+	if (!strcmp(output_device, "-")) {
+		output_init_stdout(log_output, output_buf_size, output_params, rates);
+	} else {
 #if ALSA
-	output_init(log_output, output_device, output_buf_size, alsa_buffer, alsa_period, alsa_sample_fmt, alsa_mmap, 
-				max_rate, rt_priority);
+		output_init_alsa(log_output, output_device, output_buf_size, output_params, rates, rt_priority);
 #endif
 #if PORTAUDIO
-	output_init(log_output, output_device, output_buf_size, pa_latency, pa_osx_playnice, max_rate);
+		output_init_pa(log_output, output_device, output_buf_size, output_params, rates);
+#endif
+	}
+
+#if DSD
+	dop_init(dop);
 #endif
 
 #if VISEXPORT
 	if (visexport) {
-		output_vis_init(mac);
+		output_vis_init(log_output, mac);
 	}
 #endif
 
 	decode_init(log_decode, codecs);
 
 #if RESAMPLE
-	if (upsample) {
-		process_init(upsample);
+	if (resample) {
+		process_init(resample);
 	}
 #endif
 
@@ -382,7 +430,17 @@ int main(int argc, char **argv) {
 	
 	decode_close();
 	stream_close();
-	output_close();
+
+	if (!strcmp(output_device, "-")) {
+		output_close_stdout();
+	} else {
+#if ALSA
+		output_close_alsa();
+#endif
+#if PORTAUDIO
+		output_close_pa();
+#endif
+	}
 
 #if WIN
 	winsock_close();

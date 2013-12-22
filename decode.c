@@ -129,8 +129,11 @@ void decode_init(log_level level, const char *opt) {
 	LOG_INFO("init decode");
 
 	// register codecs
-	// alc,wma,wmap,wmal,aac,spt,ogg,ogf,flc,aif,pcm,mp3
+	// dsf,dff,alc,wma,wmap,wmal,aac,spt,ogg,ogf,flc,aif,pcm,mp3
 	i = 0;
+#if DSD
+	if (!opt || strstr(opt, "dsd"))  codecs[i++] = register_dsd();
+#endif
 #if FFMPEG
 	if (!opt || strstr(opt, "alac"))  codecs[i++] = register_ff("alc");
 	if (!opt || strstr(opt, "wma"))  codecs[i++] = register_ff("wma");
@@ -191,11 +194,11 @@ void decode_flush(void) {
 	UNLOCK_D;
 }
 
-unsigned decode_newstream(unsigned sample_rate, unsigned max_sample_rate) {
+unsigned decode_newstream(unsigned sample_rate, unsigned supported_rates[]) {
 
 	MAY_PROCESS(
 		if (decode.process) {
-			return process_newstream(&decode.direct, sample_rate, max_sample_rate);
+			return process_newstream(&decode.direct, sample_rate, supported_rates);
 		}
 	);
 
