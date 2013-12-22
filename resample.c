@@ -135,6 +135,14 @@ bool resample_newstream(struct processstate *process, unsigned raw_sample_rate, 
 				break;
 			}
 		}
+		// else find next highest sync sample rate
+		while (!outrate && i >= 0) {
+			if (supported_rates[i] > raw_sample_rate && supported_rates[i] % raw_sample_rate == 0) {
+				outrate = supported_rates[i];
+				break;
+			}
+			i--;
+		}
 	}
 
 	if (!outrate) {
