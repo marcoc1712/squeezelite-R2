@@ -225,7 +225,7 @@ void codec_open(u8_t format, u8_t sample_size, u8_t sample_rate, u8_t channels, 
 		if (codecs[i] && codecs[i]->id == format) {
 
 			if (codec && codec != codecs[i]) {
-				LOG_INFO("closing codec");
+				LOG_INFO("closing codec: '%c'", codec->id);
 				codec->close();
 			}
 			

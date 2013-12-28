@@ -279,13 +279,15 @@ int main(int argc, char **argv) {
 					rates[i] = last = largest;
 				}
 			} else {
-				// optstr is <max>-<min> or <max>, extract rates from test rates within this range
+				// optstr is <min>-<max> or <max>, extract rates from test rates within this range
 				unsigned ref[] TEST_RATES;
-				char *maxstr = next_param(optarg, '-');
-				char *minstr = next_param(NULL, '-');
-				unsigned max = maxstr ? atoi(maxstr) : ref[0];
-				unsigned min = minstr ? atoi(minstr) : 0;
+				char *str1 = next_param(optarg, '-');
+				char *str2 = next_param(NULL, '-');
+				unsigned max = str2 ? atoi(str2) : (str1 ? atoi(str1) : ref[0]);
+				unsigned min = str1 && str2 ? atoi(str1) : 0;
+				unsigned tmp;
 				int i, j;
+				if (max < min) { tmp = max; max = min; min = tmp; }
 				rates[0] = max;
 				for (i = 0, j = 1; i < MAX_SUPPORTED_SAMPLERATES; ++i) {
 					if (ref[i] < rates[j-1] && ref[i] >= min) {

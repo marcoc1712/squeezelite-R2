@@ -31,6 +31,7 @@
 
 struct vorbis {
 	OggVorbis_File *vf;
+	bool opened;
 #if !LINKALL
 	// vorbis symbols to be dynamically loaded - from either vorbisfile or vorbisidec (tremor) version of library
 	vorbis_info *(* ov_info)(OggVorbis_File *vf, int link);
@@ -142,6 +143,7 @@ static decode_state vorbis_decode(void) {
 			UNLOCK_S;
 			return DECODE_COMPLETE;
 		}
+		v->opened = true;
 
 		info = OV(v, info, v->vf, -1);
 
@@ -245,13 +247,20 @@ static decode_state vorbis_decode(void) {
 static void vorbis_open(u8_t size, u8_t rate, u8_t chan, u8_t endianness) {
 	if (!v->vf) {
 		v->vf = malloc(sizeof(OggVorbis_File) + 128); // add some padding as struct size may be larger
+		memset(v->vf, 0, sizeof(OggVorbis_File) + 128);
 	} else {
-		OV(v, clear, v->vf);
+		if (v->opened) {
+			OV(v, clear, v->vf);
+			v->opened = false;
+		}
 	}
 }
 
 static void vorbis_close(void) {
-	OV(v, clear, v->vf);
+	if (v->opened) {
+		OV(v, clear, v->vf);
+		v->opened = false;
+	}
 	free(v->vf);
 	v->vf = NULL;
 }
@@ -306,6 +315,7 @@ struct codec *register_vorbis(void) {
 	}
 
 	v->vf = NULL;
+	v->opened = false;
 
 	if (!load_vorbis()) {
 		return NULL;
