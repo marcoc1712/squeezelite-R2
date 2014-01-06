@@ -58,13 +58,15 @@ void list_devices(void) {
 		LOG_WARN("error initialising port audio: %s", Pa_GetErrorText(err));
 		return;
 	}
-
+	
 	printf("Output devices:\n");
 	for (i = 0; i < Pa_GetDeviceCount(); ++i) {
-		printf("  %i - %s [%s]\n", i, Pa_GetDeviceInfo(i)->name, Pa_GetHostApiInfo(Pa_GetDeviceInfo(i)->hostApi)->name);
+		if (Pa_GetDeviceInfo(i)->maxOutputChannels) {
+			printf("  %i - %s [%s]\n", i, Pa_GetDeviceInfo(i)->name, Pa_GetHostApiInfo(Pa_GetDeviceInfo(i)->hostApi)->name);
+		}
 	}
 	printf("\n");
-
+	
  	if ((err = Pa_Terminate()) != paNoError) {
 		LOG_WARN("error closing port audio: %s", Pa_GetErrorText(err));
 	}
@@ -328,13 +330,22 @@ static int _write_frames(frames_t out_frames, bool silence, s32_t gainL, s32_t g
 static int pa_callback(const void *pa_input, void *pa_output, unsigned long pa_frames_wanted, 
 					   const PaStreamCallbackTimeInfo *time_info, PaStreamCallbackFlags statusFlags, void *userData) {
 	int ret;
+	double stream_time;
 	frames_t frames;
 
 	optr = (u8_t *)pa_output;
 
 	LOCK;
 
-	output.device_frames = (unsigned)((time_info->outputBufferDacTime - Pa_GetStreamTime(pa.stream)) * output.current_sample_rate);
+	stream_time = Pa_GetStreamTime(pa.stream);
+
+	if (time_info->outputBufferDacTime > stream_time) {
+		// workaround for wdm-ks which can return outputBufferDacTime with a different epoch
+		output.device_frames = (unsigned)((time_info->outputBufferDacTime - stream_time) * output.current_sample_rate);
+	} else {
+		output.device_frames = 0;
+	}
+
 	output.updated = gettime_ms();
 
 	frames = _output_frames(pa_frames_wanted);
