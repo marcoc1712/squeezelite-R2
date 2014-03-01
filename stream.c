@@ -82,19 +82,45 @@ static void *stream_thread() {
 		size_t space;
 
 		LOCK;
-		space = min(_buf_space(streambuf), _buf_cont_write(streambuf));
-		UNLOCK;
 
-		if (fd >= 0 && stream.state > STREAMING_WAIT && space) {
+		space = min(_buf_space(streambuf), _buf_cont_write(streambuf));
+
+		if (fd < 0 || !space || stream.state <= STREAMING_WAIT) {
+			UNLOCK;
+			usleep(100000);
+			continue;
+		}
+
+		if (stream.state == STREAMING_FILE) {
+
+			int n = read(fd, streambuf->writep, space);
+			if (n == 0) {
+				LOG_INFO("end of stream");
+				_disconnect(DISCONNECT, DISCONNECT_OK);
+			}
+			if (n > 0) {
+				_buf_inc_writep(streambuf, n);
+				stream.bytes += n;
+				LOG_SDEBUG("streambuf read %d bytes", n);
+			}
+			if (n < 0) {
+				LOG_WARN("error reading: %s", strerror(last_error()));
+				_disconnect(DISCONNECT, REMOTE_DISCONNECT);
+			}
+
+			UNLOCK;
+			continue;
+
+		} else {
+
 			pollinfo.fd = fd;
 			pollinfo.events = POLLIN;
 			if (stream.state == SEND_HEADERS) {
 				pollinfo.events |= POLLOUT;
 			}
-		} else {
-			usleep(100000);
-			continue;
 		}
+
+		UNLOCK;
 
 		if (poll(&pollinfo, 1, 100)) {
 
@@ -218,7 +244,7 @@ static void *stream_thread() {
 						space = min(space, stream.meta_next);
 					}
 					
-					n = stream.state == STREAMING_FILE ? read(fd, streambuf->writep, space) : recv(fd, streambuf->writep, space, 0);
+					n = stream.state == recv(fd, streambuf->writep, space, 0);
 					if (n == 0) {
 						LOG_INFO("end of stream");
 						_disconnect(DISCONNECT, DISCONNECT_OK);
@@ -315,7 +341,12 @@ void stream_file(const char *header, size_t header_len, unsigned threshold) {
 
 	LOG_INFO("opening local file: %s", stream.header);
 
+#if WIN
+	fd = open(stream.header, O_RDONLY | O_BINARY);
+#else
 	fd = open(stream.header, O_RDONLY);
+#endif
+
 	stream.state = STREAMING_FILE;
 	if (fd < 0) {
 		LOG_INFO("can't open file: %s", stream.header);
