@@ -244,7 +244,7 @@ static void *stream_thread() {
 						space = min(space, stream.meta_next);
 					}
 					
-					n = stream.state == recv(fd, streambuf->writep, space, 0);
+					n = recv(fd, streambuf->writep, space, 0);
 					if (n == 0) {
 						LOG_INFO("end of stream");
 						_disconnect(DISCONNECT, DISCONNECT_OK);
