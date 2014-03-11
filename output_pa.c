@@ -369,7 +369,7 @@ static int pa_callback(const void *pa_input, void *pa_output, unsigned long pa_f
 	return ret;
 }
 
-void output_init_pa(log_level level, const char *device, unsigned output_buf_size, char *params, unsigned rates[]) {
+void output_init_pa(log_level level, const char *device, unsigned output_buf_size, char *params, unsigned rates[], unsigned rate_delay) {
 	PaError err;
 	unsigned latency = 0;
 	int osx_playnice = -1;
@@ -391,6 +391,7 @@ void output_init_pa(log_level level, const char *device, unsigned output_buf_siz
 	output.format = 0;
 	output.start_frames = 0;
 	output.write_cb = &_write_frames;
+	output.rate_delay = rate_delay;
 	pa.stream = NULL;
 
 	LOG_INFO("requested latency: %u", output.latency);
