@@ -151,7 +151,7 @@ void output_init_stdout(log_level level, unsigned output_buf_size, char *params,
 
 	output_init_common(level, "-", output_buf_size, rates);
 
-#if LINUX || OSX
+#if LINUX || OSX || FREEBSD
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + OUTPUT_THREAD_STACK_SIZE);

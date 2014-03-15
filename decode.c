@@ -149,7 +149,7 @@ void decode_init(log_level level, const char *opt) {
 
 	mutex_create(decode.mutex);
 
-#if LINUX || OSX
+#if LINUX || OSX || FREEBSD
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + DECODE_THREAD_STACK_SIZE);
@@ -178,7 +178,7 @@ void decode_close(void) {
 	}
 	running = false;
 	UNLOCK_D;
-#if LINUX || OSX
+#if LINUX || OSX || FREEBSD
 	pthread_join(thread, NULL);
 #endif
 	mutex_destroy(decode.mutex);

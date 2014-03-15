@@ -1,0 +1,4 @@
+CPPFLAGS = -I/usr/local/include
+LDFLAGS = -L/usr/local/lib -lportaudio -lpthread -lm
+
+include Makefile
