@@ -286,7 +286,7 @@ void _pa_open(void) {
 #endif
 	}
 
-	output.error_opening = !err;
+	output.error_opening = !!err;
 }
 
 static u8_t *optr;
