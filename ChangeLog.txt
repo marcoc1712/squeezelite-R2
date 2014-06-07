@@ -90,3 +90,10 @@ Minor changes
 - log command line to logfile when debugging enabled
 - option to exclude codecs (-e)
 - support parallel execution of libsoxr
+
+Version 1.6.3
+=============
+
+Minor changes
+- reduce time to start track when playing local files
+
