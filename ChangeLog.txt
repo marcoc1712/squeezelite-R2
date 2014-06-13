@@ -96,4 +96,4 @@ Version 1.6.3
 
 Minor changes
 - reduce time to start track when playing local files
-
+- disable use of OPENMP when RESAMPLE build option defined, add new option RESAMPLE_MP to enable it
