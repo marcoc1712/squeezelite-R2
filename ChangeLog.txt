@@ -91,8 +91,8 @@ Minor changes
 - option to exclude codecs (-e)
 - support parallel execution of libsoxr
 
-Version 1.6.3
-=============
+Version 1.6.3 14/6/14
+=====================
 
 Minor changes
 - reduce time to start track when playing local files
