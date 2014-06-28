@@ -351,6 +351,7 @@ static int pa_callback(const void *pa_input, void *pa_output, unsigned long pa_f
 	}
 
 	output.updated = gettime_ms();
+	output.frames_played_dmp = output.frames_played;
 
 	do {
 		frames = _output_frames(pa_frames_wanted);
