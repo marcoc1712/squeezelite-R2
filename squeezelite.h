@@ -22,6 +22,10 @@
 
 #define VERSION "v1.6.5"
 
+#if !defined(MODEL_NAME)
+#define MODEL_NAME SqueezeLite
+#endif
+
 // build detection
 #if defined(linux)
 #define LINUX     1
