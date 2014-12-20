@@ -26,6 +26,10 @@
 #define MODEL_NAME SqueezeLite
 #endif
 
+#define QUOTE(name) #name
+#define STR(macro)  QUOTE(macro)
+#define MODEL_NAME_STRING STR(MODEL_NAME)
+
 // build detection
 #if defined(linux)
 #define LINUX     1
@@ -413,7 +417,7 @@ void buf_init(struct buffer *buf, size_t size);
 void buf_destroy(struct buffer *buf);
 
 // slimproto.c
-void slimproto(log_level level, char *server, u8_t mac[6], const char *name, const char *namefile);
+void slimproto(log_level level, char *server, u8_t mac[6], const char *name, const char *namefile, const char *modelname);
 void slimproto_stop(void);
 void wake_controller(void);
 
