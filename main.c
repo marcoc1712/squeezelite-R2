@@ -236,13 +236,13 @@ int main(int argc, char **argv) {
 			optind += 1;
 		} else {
 			usage(argv[0]);
-            exit(0);
+			exit(0);
 		}
 
 		switch (opt[0]) {
-        case 'o':
-            output_device = optarg;
-            break;
+		case 'o':
+			output_device = optarg;
+			break;
 		case 'a':
 			output_params = optarg;
 			break;
@@ -260,7 +260,7 @@ int main(int argc, char **argv) {
 		case 'e':
 			exclude_codecs = optarg;
 			break;
-        case 'd':
+		case 'd':
 			{
 				char *l = strtok(optarg, "=");
 				char *v = strtok(NULL, "=");
@@ -278,7 +278,7 @@ int main(int argc, char **argv) {
 					exit(0);
 				}
 			}
-            break;
+			break;
 		case 'f':
 			logfile = optarg;
 			break;
@@ -398,10 +398,10 @@ int main(int argc, char **argv) {
 		case 't':
 			license();
 			exit(0);
-        default:
+		default:
 			break;
-        }
-    }
+		}
+	}
 
 	// warn if command line includes something which isn't parsed
 	if (optind < argc) {

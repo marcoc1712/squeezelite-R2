@@ -70,7 +70,7 @@ char *next_param(char *src, char c) {
 	static char *str = NULL;
 	char *ptr, *ret;
 	if (src) str = src;
- 	if (str && (ptr = strchr(str, c))) {
+	if (str && (ptr = strchr(str, c))) {
 		ret = str;
 		*ptr = '\0';
 		str = ptr + 1;
@@ -103,19 +103,19 @@ u32_t gettime_ms(void) {
 #if LINUX
 // search first 4 interfaces returned by IFCONF
 void get_mac(u8_t mac[]) {
-    struct ifconf ifc;
-    struct ifreq *ifr, *ifend;
-    struct ifreq ifreq;
-    struct ifreq ifs[4];
+	struct ifconf ifc;
+	struct ifreq *ifr, *ifend;
+	struct ifreq ifreq;
+	struct ifreq ifs[4];
 
 	mac[0] = mac[1] = mac[2] = mac[3] = mac[4] = mac[5] = 0;
 
-    int s = socket(AF_INET, SOCK_DGRAM, 0);
- 
-    ifc.ifc_len = sizeof(ifs);
-    ifc.ifc_req = ifs;
+	int s = socket(AF_INET, SOCK_DGRAM, 0);
 
-    if (ioctl(s, SIOCGIFCONF, &ifc) == 0) {
+	ifc.ifc_len = sizeof(ifs);
+	ifc.ifc_req = ifs;
+
+	if (ioctl(s, SIOCGIFCONF, &ifc) == 0) {
 		ifend = ifs + (ifc.ifc_len / sizeof(struct ifreq));
 
 		for (ifr = ifc.ifc_req; ifr < ifend; ifr++) {
@@ -163,9 +163,9 @@ void get_mac(u8_t mac[]) {
 #if WIN
 #pragma comment(lib, "IPHLPAPI.lib")
 void get_mac(u8_t mac[]) {
-    IP_ADAPTER_INFO AdapterInfo[16];
-    DWORD dwBufLen = sizeof(AdapterInfo);
-    DWORD dwStatus = GetAdaptersInfo(AdapterInfo, &dwBufLen);
+	IP_ADAPTER_INFO AdapterInfo[16];
+	DWORD dwBufLen = sizeof(AdapterInfo);
+	DWORD dwStatus = GetAdaptersInfo(AdapterInfo, &dwBufLen);
 	
 	mac[0] = mac[1] = mac[2] = mac[3] = mac[4] = mac[5] = 0;
 
@@ -316,13 +316,13 @@ void set_nosigpipe(sockfd s) {
 
 #if WIN
 void winsock_init(void) {
-    WSADATA wsaData;
+	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
-    int WSerr = WSAStartup(wVersionRequested, &wsaData);
-    if (WSerr != 0) {
-        LOG_ERROR("Bad winsock version");
-        exit(1);
-    }
+	int WSerr = WSAStartup(wVersionRequested, &wsaData);
+	if (WSerr != 0) {
+		LOG_ERROR("Bad winsock version");
+		exit(1);
+	}
 }
 
 void winsock_close(void) {
@@ -366,7 +366,7 @@ int poll(struct pollfd *fds, unsigned long numfds, int timeout) {
 	tv.tv_usec = 1000 * (timeout % 1000);
 	
 	ret = select(fds[0].fd + 1, &r, &w, NULL, &tv);
-    
+
 	if (ret < 0) return ret;
 	
 	fds[0].revents = 0;
@@ -383,6 +383,6 @@ void touch_memory(u8_t *buf, size_t size) {
 	u8_t *ptr;
 	for (ptr = buf; ptr < buf + size; ptr += sysconf(_SC_PAGESIZE)) {
 		*ptr = 0;
-   	}
+	}
 }
 #endif
