@@ -20,7 +20,7 @@
 
 // make may define: PORTAUDIO, SELFPIPE, RESAMPLE, RESAMPLE_MP, VISEXPORT, DSD, LINKALL to influence build
 
-#define VERSION "v1.7"
+#define VERSION "v1.7.1-beta"
 
 #if !defined(MODEL_NAME)
 #define MODEL_NAME SqueezeLite
@@ -448,7 +448,7 @@ void stream_sock(u32_t ip, u16_t port, const char *header, size_t header_len, un
 bool stream_disconnect(void);
 
 // decode.c
-typedef enum { DECODE_STOPPED = 0, DECODE_RUNNING, DECODE_COMPLETE, DECODE_ERROR } decode_state;
+typedef enum { DECODE_STOPPED = 0, DECODE_READY, DECODE_RUNNING, DECODE_COMPLETE, DECODE_ERROR } decode_state;
 
 struct decodestate {
 	decode_state state;
