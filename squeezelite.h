@@ -561,6 +561,7 @@ struct outputstate {
 	u8_t  *track_start;        // set in decode thread
 	u32_t gainL;               // set by slimproto
 	u32_t gainR;               // set by slimproto
+	int polarity;              // set by slimproto (1 or -1)
 	u32_t next_replay_gain;    // set by slimproto
 	unsigned threshold;        // set by slimproto
 	fade_state fade;
