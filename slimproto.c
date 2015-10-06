@@ -784,7 +784,8 @@ void slimproto(log_level level, char *server, u8_t mac[6], const char *name, con
 	unsigned failed_connect = 0;
 	unsigned slimproto_port = 0;
 	int i;
-
+	unsigned ref[] TEST_RATES;
+	
 	wake_create(wake_e);
 
 	loglevel = level;
@@ -829,7 +830,6 @@ void slimproto(log_level level, char *server, u8_t mac[6], const char *name, con
 	if (!running) return;
 
 	LOCK_O;
-	unsigned ref[] TEST_RATES;
 	snprintf(fixed_cap, FIXED_CAP_LEN, ",ModelName=%s,MaxSampleRate=%u", modelname ? modelname : MODEL_NAME_STRING,
 		 lms_downsample ? output.supported_rates[0] : ref[0]);
 	
