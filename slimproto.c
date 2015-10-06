@@ -777,7 +777,7 @@ in_addr_t discover_server(void) {
 #define FIXED_CAP_LEN 256
 #define VAR_CAP_LEN   128
 
-void slimproto(log_level level, char *server, u8_t mac[6], const char *name, const char *namefile, const char *modelname) {
+void slimproto(log_level level, char *server, u8_t mac[6], const char *name, const char *namefile, const char *modelname, bool lms_downsample) {
 	struct sockaddr_in serv_addr;
 	static char fixed_cap[FIXED_CAP_LEN], var_cap[VAR_CAP_LEN] = "";
 	bool reconnect = false;
@@ -829,8 +829,9 @@ void slimproto(log_level level, char *server, u8_t mac[6], const char *name, con
 	if (!running) return;
 
 	LOCK_O;
+	unsigned ref[] TEST_RATES;
 	snprintf(fixed_cap, FIXED_CAP_LEN, ",ModelName=%s,MaxSampleRate=%u", modelname ? modelname : MODEL_NAME_STRING,
-			 output.supported_rates[0]);
+		 lms_downsample ? output.supported_rates[0] : ref[0]);
 	
 	for (i = 0; i < MAX_CODECS; i++) {
 		if (codecs[i] && codecs[i]->id && strlen(fixed_cap) < FIXED_CAP_LEN - 10) {
