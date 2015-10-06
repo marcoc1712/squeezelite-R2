@@ -4,6 +4,7 @@ Squeezelite - lightweight headless squeezebox emulator
 (c) Adrian Smith 2012-2015, triode1@btinternet.com
 
 Modified version, see https://github.com/marcoc1712/squeezelite/tree/mc2_allow_lms_side_pcm_upsampling.
+Modified version, see https://github.com/marcoc1712/squeezelite/tree/Daphile_disable_lms_side_downsampling.
 
 Released under GPLv3 license:
 
