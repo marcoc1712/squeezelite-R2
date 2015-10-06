@@ -153,8 +153,10 @@ static void _check_header(void) {
 			}
 		}
 
+	} else if (stream.state == STREAMING_FILE) {
+		LOG_WARN("unknown format - can't parse header in file, fault back to server parameters");
 	} else {
-		LOG_WARN("unknown format - can't parse header");
+		LOG_INFO("unknown format - can't parse header in stream, using server parameters");
 	}
 }
 
@@ -166,8 +168,14 @@ static decode_state pcm_decode(void) {
 	u8_t tmp[16];
 	
 	LOCK_S;
+	
+	// mc2 - 05/09/2015
+	// When Wav or Aiff is streamed the header is preserved, so we
+	// could verify the real file forma. Usefull when resampling
+	// from server, in that case server parameters are wrong.
 
-	if (decode.new_stream && stream.state == STREAMING_FILE) {
+	//if (decode.new_stream && stream.state == STREAMING_FILE) {
+	if (decode.new_stream) {
 		_check_header();
 	}
 

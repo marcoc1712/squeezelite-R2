@@ -23,7 +23,7 @@
 #include <signal.h>
 
 #define TITLE "Squeezelite " VERSION ", Copyright 2012-2015 Adrian Smith."
-
+#define MODINFO "modified version, see https://github.com/marcoc1712/squeezelite/tree/mc2_allow_lms_side_pcm_upsampling"
 #define CODECS_BASE "flac,pcm,mp3,ogg,aac"
 #if FFMPEG
 #define CODECS_FF   ",wma,alac"
@@ -40,7 +40,7 @@
 #define CODECS CODECS_BASE CODECS_FF CODECS_DSD CODECS_MP3
 
 static void usage(const char *argv0) {
-	printf(TITLE " See -t for license terms\n"
+	printf(TITLE  "\n" MODINFO "\nSee -t for license terms\n\n"
 		   "Usage: %s [options]\n"
 		   "  -s <server>[:<port>]\tConnect to specified server, otherwise uses autodiscovery to find server\n"
 		   "  -o <output device>\tSpecify output device, default \"default\", - = output to stdout\n"
