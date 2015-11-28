@@ -3,7 +3,7 @@
 This is a modified version of squeezelite by Adrian Smith (Triode). 
 At the moment of writing (October 2015), original code is here: https://code.google.com/p/squeezelite/
 
-This verison was originally meant to always inspect pcm headers (if awaillable)  to detect the real samplerate, depth and endianess,
+This version was originally meant to always inspect pcm headers (if awaillable)  to detect the real samplerate, depth and endianess,
 in order to override the wrong information coming form the server when transcoding or upsampling, this  way you could save encodind 
 after upsampling on LMS.
 
