@@ -10,56 +10,6 @@
         <df name="Win">
         </df>
       </df>
-      <df name="debian">
-        <df name="man">
-        </df>
-        <df name="patches">
-        </df>
-        <df name="source">
-        </df>
-        <df name="squeezelite">
-          <df name="DEBIAN">
-          </df>
-          <df name="etc">
-            <df name="default">
-            </df>
-            <df name="init.d">
-            </df>
-          </df>
-          <df name="usr">
-            <df name="bin">
-            </df>
-            <df name="share">
-              <df name="doc">
-                <df name="squeezelite">
-                </df>
-              </df>
-              <df name="man">
-                <df name="man1">
-                </df>
-              </df>
-            </df>
-          </df>
-        </df>
-        <df name="squeezelite-pa">
-          <df name="DEBIAN">
-          </df>
-          <df name="usr">
-            <df name="bin">
-            </df>
-            <df name="share">
-              <df name="doc">
-                <df name="squeezelite-pa">
-                </df>
-              </df>
-              <df name="man">
-                <df name="man1">
-                </df>
-              </df>
-            </df>
-          </df>
-        </df>
-      </df>
       <df name="Debug">
       </df>
       <df name="dsd2pcm">
