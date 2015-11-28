@@ -22,9 +22,9 @@
 
 #include <signal.h>
 
-#define TITLE "Squeezelite " VERSION ", Copyright 2012-2015 Adrian Smith."
-#define MODINFO1 "modified version, see https://github.com/marcoc1712/squeezelite/tree/mc2_allow_lms_side_pcm_upsampling"
-#define MODINFO2 "modified version, see https://github.com/marcoc1712/squeezelite/tree/Daphile_disable_lms_side_downsampling"
+#define TITLE "Squeezelite Copyright 2012-2015 Adrian Smith."
+#define MODINFO "this modified version (" VERSION "), Copyright 2015 Marco Curti."
+#define MODINFO2 "see https://github.com/marcoc1712/squeezelite"
 #define CODECS_BASE "flac,pcm,mp3,ogg,aac"
 #if FFMPEG
 #define CODECS_FF   ",wma,alac"
@@ -41,7 +41,8 @@
 #define CODECS CODECS_BASE CODECS_FF CODECS_DSD CODECS_MP3
 
 static void usage(const char *argv0) {
-	printf(TITLE "\n" MODINFO1 "\n" MODINFO2 "\n\nSee -t for license terms\n"
+	printf(TITLE "\n" MODINFO "\n" MODINFO2
+		   "\n\nSee -t for license terms\n"
 		   "Usage: %s [options]\n"
 		   "  -s <server>[:<port>]\tConnect to specified server, otherwise uses autodiscovery to find server\n"
 		   "  -o <output device>\tSpecify output device, default \"default\", - = output to stdout\n"
@@ -164,7 +165,8 @@ static void usage(const char *argv0) {
 }
 
 static void license(void) {
-	printf(TITLE "\n\n"
+	printf(TITLE "\n" MODINFO "\n" MODINFO2 "\n"
+		   "-h option patch, to disable LMS downsampling, (c) 2015 Daphile\n\n"
 		   "This program is free software: you can redistribute it and/or modify\n"
 		   "it under the terms of the GNU General Public License as published by\n"
 		   "the Free Software Foundation, either version 3 of the License, or\n"

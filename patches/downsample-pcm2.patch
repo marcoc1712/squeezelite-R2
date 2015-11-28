@@ -1,0 +1,63 @@
+From 598d1bb00eacf65580039494b85025d83256848d Mon Sep 17 00:00:00 2001
+From: marco <marco@pc>
+Date: 30-set-2015 13.09.08
+
+Added Source reference text and some better detailed log message
+
+diff --git a/LICENSE.txt b/LICENSE.txt
+index 2ec37c2..d45399f 100644
+--- a/LICENSE.txt
++++ b/LICENSE.txt
+@@ -1,9 +1,10 @@
+-Modified version of:
+---------------------------------------------------------
++
+ Squeezelite - lightweight headless squeezebox emulator
+ 
+ (c) Adrian Smith 2012-2015, triode1@btinternet.com
+ 
++Modified version, see https://github.com/marcoc1712/squeezelite/tree/mc2_wav_resample.
++
+ Released under GPLv3 license:
+ 
+ This program is free software: you can redistribute it and/or modify
+diff --git a/main.c b/main.c
+index 19f8b2a..e0ac0a7 100644
+--- a/main.c
++++ b/main.c
+@@ -23,7 +23,7 @@
+ #include <signal.h>
+ 
+ #define TITLE "Squeezelite " VERSION ", Copyright 2012-2015 Adrian Smith."
+-
++#define MODINFO "modified version, see https://github.com/marcoc1712/squeezelite/tree/mc2_wav_resample"
+ #define CODECS_BASE "flac,pcm,mp3,ogg,aac"
+ #if FFMPEG
+ #define CODECS_FF   ",wma,alac"
+@@ -40,9 +40,7 @@
+ #define CODECS CODECS_BASE CODECS_FF CODECS_DSD CODECS_MP3
+ 
+ static void usage(const char *argv0) {
+-	printf(TITLE
+-              "modified version, see https://github.com/marcoc1712/squeezelite/tree/mc2_wav_resample"
+-		   " See -t for license terms\n"
++	printf(TITLE  "\n" MODINFO "\nSee -t for license terms\n\n"
+ 		   "Usage: %s [options]\n"
+ 		   "  -s <server>[:<port>]\tConnect to specified server, otherwise uses autodiscovery to find server\n"
+ 		   "  -o <output device>\tSpecify output device, default \"default\", - = output to stdout\n"
+diff --git a/pcm.c b/pcm.c
+index 74ce5d1..5cbe497 100644
+--- a/pcm.c
++++ b/pcm.c
+@@ -154,9 +154,9 @@
+ 		}
+ 
+ 	} else if (stream.state == STREAMING_FILE) {
+-		LOG_WARN("unknown format - can't parse header");
++		LOG_WARN("unknown format - can't parse header in file, fault back to server parameters");
+ 	} else {
+-		LOG_INFO("unknown format - can't parse header, using server parameters");
++		LOG_INFO("unknown format - can't parse header in stream, using server parameters");
+ 	}
+ }
+ 

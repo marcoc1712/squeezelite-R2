@@ -135,3 +135,12 @@ Features
 - support for basic IR input using LIRC on Linux
 - support for volume adjustment or unmuting of alsa mixer
 - support for inverting output polarity via LMS setting (requires recent 7.9 server)
+
+Version 1.8.1 (R2) 1/10/15
+==========================
+
+First R2 release.
+
+Features
+- Allow server side upsampling for PCM streams (always read the header).
+- disable LMS downsampling using -h option. (thanks to Daphile).

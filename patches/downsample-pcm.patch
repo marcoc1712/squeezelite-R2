@@ -1,0 +1,26 @@
+From fe0dcc489ce68be37cd5a1937ea19ce267933aca Mon Sep 17 00:00:00 2001
+From: marco <marco@pc>
+Date: 6-set-2015 13.11.12
+
+Modified pcm.c in order to perform _check_headers also on incoming streams and not just on files.
+
+diff --git a/pcm.c b/pcm.c
+index c867ef5..1db6960 100644
+--- a/pcm.c
++++ b/pcm.c
+@@ -166,8 +166,14 @@
+ 	u8_t tmp[16];
+ 	
+ 	LOCK_S;
++	
++	// mc2 - 05/09/2015
++	// When Wav or Aiff is streamed the header is preserved, so we
++	// could verify the real file forma. Usefull when resampling
++	// from server, in that case server parameters are wrong.
+ 
+-	if (decode.new_stream && stream.state == STREAMING_FILE) {
++	//if (decode.new_stream && stream.state == STREAMING_FILE) {
++	if (decode.new_stream) {
+ 		_check_header();
+ 	}
+ 

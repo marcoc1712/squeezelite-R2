@@ -1,0 +1,154 @@
+cc -Wall -fPIC -O2   main.c -c -o main.o
+main.c:1: warning: -fPIC ignored for target (all code is position independent)
+In file included from main.c:21:
+squeezelite.h:55:2: #error unknown target
+In file included from main.c:21:
+squeezelite.h:308: error: parse error before "frames_t"
+squeezelite.h:308: warning: type defaults to `int' in declaration of `frames_t'
+squeezelite.h:308: warning: data definition has no type or storage class
+squeezelite.h:376: error: parse error before "gettime_ms"
+squeezelite.h:376: warning: type defaults to `int' in declaration of `gettime_ms'
+squeezelite.h:376: warning: data definition has no type or storage class
+squeezelite.h:377: error: parse error before '*' token
+squeezelite.h:379: error: parse error before "socklen_t"
+squeezelite.h:380: error: parse error before "in_addr_t"
+squeezelite.h:381: error: parse error before "handles"
+squeezelite.h:382: error: parse error before "handles"
+squeezelite.h:383: error: parse error before '*' token
+squeezelite.h:384: error: parse error before '*' token
+squeezelite.h:385: error: parse error before "unpackN"
+squeezelite.h:385: error: parse error before '*' token
+squeezelite.h:385: warning: type defaults to `int' in declaration of `unpackN'
+squeezelite.h:385: warning: data definition has no type or storage class
+squeezelite.h:386: error: parse error before "unpackn"
+squeezelite.h:386: error: parse error before '*' token
+squeezelite.h:386: warning: type defaults to `int' in declaration of `unpackn'
+squeezelite.h:386: warning: data definition has no type or storage class
+squeezelite.h:406: error: parse error before "u8_t"
+squeezelite.h:406: warning: no semicolon at end of struct or union
+squeezelite.h:407: warning: type defaults to `int' in declaration of `readp'
+squeezelite.h:407: warning: data definition has no type or storage class
+squeezelite.h:408: error: parse error before '*' token
+squeezelite.h:408: warning: type defaults to `int' in declaration of `writep'
+squeezelite.h:408: warning: data definition has no type or storage class
+squeezelite.h:409: error: parse error before '*' token
+squeezelite.h:409: warning: type defaults to `int' in declaration of `wrap'
+squeezelite.h:409: warning: data definition has no type or storage class
+squeezelite.h:412: error: parse error before "mutex"
+squeezelite.h:412: warning: type defaults to `int' in declaration of `mutex'
+squeezelite.h:412: warning: data definition has no type or storage class
+squeezelite.h:429: error: parse error before "u8_t"
+squeezelite.h:443: error: parse error before "bool"
+squeezelite.h:443: warning: no semicolon at end of struct or union
+squeezelite.h:444: warning: type defaults to `int' in declaration of `cont_wait'
+squeezelite.h:444: warning: data definition has no type or storage class
+squeezelite.h:445: error: parse error before "bytes"
+squeezelite.h:445: warning: type defaults to `int' in declaration of `bytes'
+squeezelite.h:445: warning: data definition has no type or storage class
+squeezelite.h:447: error: parse error before "meta_interval"
+squeezelite.h:447: warning: type defaults to `int' in declaration of `meta_interval'
+squeezelite.h:447: warning: data definition has no type or storage class
+squeezelite.h:448: error: parse error before "meta_next"
+squeezelite.h:448: warning: type defaults to `int' in declaration of `meta_next'
+squeezelite.h:448: warning: data definition has no type or storage class
+squeezelite.h:449: error: parse error before "meta_left"
+squeezelite.h:449: warning: type defaults to `int' in declaration of `meta_left'
+squeezelite.h:449: warning: data definition has no type or storage class
+squeezelite.h:450: error: parse error before "meta_send"
+squeezelite.h:450: warning: type defaults to `int' in declaration of `meta_send'
+squeezelite.h:450: warning: data definition has no type or storage class
+squeezelite.h:456: error: parse error before "ip"
+squeezelite.h:457: error: parse error before "stream_disconnect"
+squeezelite.h:457: warning: type defaults to `int' in declaration of `stream_disconnect'
+squeezelite.h:457: warning: data definition has no type or storage class
+squeezelite.h:464: error: parse error before "bool"
+squeezelite.h:464: warning: no semicolon at end of struct or union
+squeezelite.h:465: warning: type defaults to `int' in declaration of `mutex'
+squeezelite.h:465: warning: data definition has no type or storage class
+squeezelite.h:487: error: parse error before "sample_size"
+squeezelite.h:496: error: parse error before "format"
+squeezelite.h:537: error: parse error before "bool"
+squeezelite.h:537: warning: no semicolon at end of struct or union
+squeezelite.h:539: warning: type defaults to `int' in declaration of `pa_reopen'
+squeezelite.h:539: warning: data definition has no type or storage class
+squeezelite.h:543: error: parse error before "out_frames"
+squeezelite.h:550: error: parse error before "error_opening"
+squeezelite.h:550: warning: type defaults to `int' in declaration of `error_opening'
+squeezelite.h:550: warning: data definition has no type or storage class
+squeezelite.h:552: error: parse error before "updated"
+squeezelite.h:552: warning: type defaults to `int' in declaration of `updated'
+squeezelite.h:552: warning: data definition has no type or storage class
+squeezelite.h:553: error: parse error before "track_start_time"
+squeezelite.h:553: warning: type defaults to `int' in declaration of `track_start_time'
+squeezelite.h:553: warning: data definition has no type or storage class
+squeezelite.h:554: error: parse error before "current_replay_gain"
+squeezelite.h:554: warning: type defaults to `int' in declaration of `current_replay_gain'
+squeezelite.h:554: warning: data definition has no type or storage class
+squeezelite.h:556: error: parse error before "u32_t"
+squeezelite.h:556: warning: no semicolon at end of struct or union
+squeezelite.h:557: warning: type defaults to `int' in declaration of `skip_frames'
+squeezelite.h:557: warning: data definition has no type or storage class
+squeezelite.h:558: error: parse error before "start_at"
+squeezelite.h:558: warning: type defaults to `int' in declaration of `start_at'
+squeezelite.h:558: warning: data definition has no type or storage class
+squeezelite.h:561: error: parse error before '*' token
+squeezelite.h:561: warning: type defaults to `int' in declaration of `track_start'
+squeezelite.h:561: warning: data definition has no type or storage class
+squeezelite.h:562: error: parse error before "gainL"
+squeezelite.h:562: warning: type defaults to `int' in declaration of `gainL'
+squeezelite.h:562: warning: data definition has no type or storage class
+squeezelite.h:563: error: parse error before "gainR"
+squeezelite.h:563: warning: type defaults to `int' in declaration of `gainR'
+squeezelite.h:563: warning: data definition has no type or storage class
+squeezelite.h:564: error: parse error before "invert"
+squeezelite.h:564: warning: type defaults to `int' in declaration of `invert'
+squeezelite.h:564: warning: data definition has no type or storage class
+squeezelite.h:565: error: parse error before "next_replay_gain"
+squeezelite.h:565: warning: type defaults to `int' in declaration of `next_replay_gain'
+squeezelite.h:565: warning: data definition has no type or storage class
+squeezelite.h:568: error: parse error before '*' token
+squeezelite.h:568: warning: type defaults to `int' in declaration of `fade_start'
+squeezelite.h:568: warning: data definition has no type or storage class
+squeezelite.h:569: error: parse error before '*' token
+squeezelite.h:569: warning: type defaults to `int' in declaration of `fade_end'
+squeezelite.h:569: warning: data definition has no type or storage class
+squeezelite.h:570: error: 'fade_dir' redeclared as different kind of symbol
+squeezelite.h:523: error: previous declaration of 'fade_dir' was here
+squeezelite.h:571: error: 'fade_mode' redeclared as different kind of symbol
+squeezelite.h:524: error: previous declaration of 'fade_mode' was here
+squeezelite.h:574: error: parse error before "delay_active"
+squeezelite.h:574: warning: type defaults to `int' in declaration of `delay_active'
+squeezelite.h:574: warning: data definition has no type or storage class
+squeezelite.h:575: error: parse error before "stop_time"
+squeezelite.h:575: warning: type defaults to `int' in declaration of `stop_time'
+squeezelite.h:575: warning: data definition has no type or storage class
+squeezelite.h:576: error: parse error before "idle_to"
+squeezelite.h:576: warning: type defaults to `int' in declaration of `idle_to'
+squeezelite.h:576: warning: data definition has no type or storage class
+squeezelite.h:589: error: parse error before "_output_frames"
+squeezelite.h:589: error: parse error before "avail"
+squeezelite.h:589: warning: type defaults to `int' in declaration of `_output_frames'
+squeezelite.h:589: warning: data definition has no type or storage class
+squeezelite.h:590: warning: parameter names (without types) in function declaration
+squeezelite.h:607: error: parse error before "test_open"
+squeezelite.h:607: warning: type defaults to `int' in declaration of `test_open'
+squeezelite.h:607: warning: data definition has no type or storage class
+squeezelite.h:618: error: parse error before "s32_t"
+squeezelite.h:619: error: parse error before "frames_t"
+squeezelite.h:620: error: parse error before "frames_t"
+squeezelite.h:621: error: parse error before "gain"
+squeezelite.h:621: error: parse error before "gain"
+squeezelite.h:621: warning: type defaults to `int' in declaration of `gain'
+squeezelite.h:621: warning: data definition has no type or storage class
+squeezelite.h:622: error: parse error before "to_gain"
+squeezelite.h:622: warning: type defaults to `int' in declaration of `to_gain'
+squeezelite.h:622: warning: data definition has no type or storage class
+main.c: In function `main':
+main.c:199: error: `u8_t' undeclared (first use in this function)
+main.c:199: error: (Each undeclared identifier is reported only once
+main.c:199: error: for each function it appears in.)
+main.c:199: error: parse error before "mac"
+main.c:243: error: `mac' undeclared (first use in this function)
+main.c:346: error: parse error before "strtoul"
+main.c:340: warning: unused variable `tmp'
+make: *** [main.o] Error 1

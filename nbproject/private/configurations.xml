@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="Bin">
+        <df name="Linux-amd64">
+        </df>
+        <df name="Linux-i386">
+        </df>
+        <df name="Win">
+        </df>
+      </df>
+      <df name="debian">
+        <df name="man">
+        </df>
+        <df name="patches">
+        </df>
+        <df name="source">
+        </df>
+        <df name="squeezelite">
+          <df name="DEBIAN">
+          </df>
+          <df name="etc">
+            <df name="default">
+            </df>
+            <df name="init.d">
+            </df>
+          </df>
+          <df name="usr">
+            <df name="bin">
+            </df>
+            <df name="share">
+              <df name="doc">
+                <df name="squeezelite">
+                </df>
+              </df>
+              <df name="man">
+                <df name="man1">
+                </df>
+              </df>
+            </df>
+          </df>
+        </df>
+        <df name="squeezelite-pa">
+          <df name="DEBIAN">
+          </df>
+          <df name="usr">
+            <df name="bin">
+            </df>
+            <df name="share">
+              <df name="doc">
+                <df name="squeezelite-pa">
+                </df>
+              </df>
+              <df name="man">
+                <df name="man1">
+                </df>
+              </df>
+            </df>
+          </df>
+        </df>
+      </df>
+      <df name="Debug">
+      </df>
+      <df name="dsd2pcm">
+        <in>dsd2pcm.c</in>
+        <in>dsd2pcm.h</in>
+      </df>
+      <df name="include">
+        <df name="FLAC">
+          <in>all.h</in>
+          <in>assert.h</in>
+          <in>callback.h</in>
+          <in>export.h</in>
+          <in>format.h</in>
+          <in>metadata.h</in>
+          <in>ordinals.h</in>
+          <in>stream_decoder.h</in>
+          <in>stream_encoder.h</in>
+        </df>
+        <df name="libavcodec">
+          <in>avcodec.h</in>
+          <in>avfft.h</in>
+          <in>d3d11va.h</in>
+          <in>dv_profile.h</in>
+          <in>dxva2.h</in>
+          <in>qsv.h</in>
+          <in>vaapi.h</in>
+          <in>vda.h</in>
+          <in>vdpau.h</in>
+          <in>version.h</in>
+          <in>videotoolbox.h</in>
+          <in>vorbis_parser.h</in>
+          <in>xvmc.h</in>
+        </df>
+        <df name="libavdevice">
+          <in>avdevice.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libavfilter">
+          <in>avfilter.h</in>
+          <in>avfiltergraph.h</in>
+          <in>buffersink.h</in>
+          <in>buffersrc.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libavformat">
+          <in>avformat.h</in>
+          <in>avio.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libavutil">
+          <in>adler32.h</in>
+          <in>aes.h</in>
+          <in>attributes.h</in>
+          <in>audio_fifo.h</in>
+          <in>avassert.h</in>
+          <in>avconfig.h</in>
+          <in>avstring.h</in>
+          <in>avutil.h</in>
+          <in>base64.h</in>
+          <in>blowfish.h</in>
+          <in>bprint.h</in>
+          <in>bswap.h</in>
+          <in>buffer.h</in>
+          <in>camellia.h</in>
+          <in>cast5.h</in>
+          <in>channel_layout.h</in>
+          <in>common.h</in>
+          <in>cpu.h</in>
+          <in>crc.h</in>
+          <in>dict.h</in>
+          <in>display.h</in>
+          <in>downmix_info.h</in>
+          <in>error.h</in>
+          <in>eval.h</in>
+          <in>ffversion.h</in>
+          <in>fifo.h</in>
+          <in>file.h</in>
+          <in>frame.h</in>
+          <in>hash.h</in>
+          <in>hmac.h</in>
+          <in>imgutils.h</in>
+          <in>intfloat.h</in>
+          <in>intreadwrite.h</in>
+          <in>lfg.h</in>
+          <in>log.h</in>
+          <in>lzo.h</in>
+          <in>macros.h</in>
+          <in>mathematics.h</in>
+          <in>md5.h</in>
+          <in>mem.h</in>
+          <in>motion_vector.h</in>
+          <in>murmur3.h</in>
+          <in>opencl.h</in>
+          <in>opt.h</in>
+          <in>parseutils.h</in>
+          <in>pixdesc.h</in>
+          <in>pixelutils.h</in>
+          <in>pixfmt.h</in>
+          <in>random_seed.h</in>
+          <in>rational.h</in>
+          <in>replaygain.h</in>
+          <in>ripemd.h</in>
+          <in>samplefmt.h</in>
+          <in>sha.h</in>
+          <in>sha512.h</in>
+          <in>stereo3d.h</in>
+          <in>tea.h</in>
+          <in>threadmessage.h</in>
+          <in>time.h</in>
+          <in>timecode.h</in>
+          <in>timestamp.h</in>
+          <in>twofish.h</in>
+          <in>version.h</in>
+          <in>xtea.h</in>
+        </df>
+        <df name="libpostproc">
+          <in>postprocess.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libswresample">
+          <in>swresample.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libswscale">
+          <in>swscale.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="ogg">
+          <in>ogg.h</in>
+          <in>os_types.h</in>
+        </df>
+        <df name="vorbis">
+          <in>codec.h</in>
+          <in>vorbisenc.h</in>
+          <in>vorbisfile.h</in>
+        </df>
+        <in>inttypes.h</in>
+        <in>mad.h</in>
+        <in>mpg123.h</in>
+        <in>neaacdec.h</in>
+        <in>pa_asio.h</in>
+        <in>pa_jack.h</in>
+        <in>pa_linux_alsa.h</in>
+        <in>pa_mac_core.h</in>
+        <in>pa_win_ds.h</in>
+        <in>pa_win_wasapi.h</in>
+        <in>pa_win_waveformat.h</in>
+        <in>pa_win_wdmks.h</in>
+        <in>pa_win_wmme.h</in>
+        <in>portaudio.h</in>
+        <in>soxr.h</in>
+        <in>stdint.h</in>
+      </df>
+      <df name="Istruzioni per Build">
+      </df>
+      <df name="lib">
+      </df>
+      <df name="patches">
+      </df>
+      <df name="Release">
+        <df name="Win">
+          <df name="Final">
+          </df>
+          <df name="Intermediate">
+          </df>
+        </df>
+      </df>
+      <in>buffer.c</in>
+      <in>decode.c</in>
+      <in>dop.c</in>
+      <in>dsd.c</in>
+      <in>faad.c</in>
+      <in>ffmpeg.c</in>
+      <in>flac.c</in>
+      <in>ir.c</in>
+      <in>mad.c</in>
+      <in>main.c</in>
+      <in>mpg.c</in>
+      <in>output.c</in>
+      <in>output_alsa.c</in>
+      <in>output_pa.c</in>
+      <in>output_pack.c</in>
+      <in>output_stdout.c</in>
+      <in>output_vis.c</in>
+      <in>pcm.c</in>
+      <in>process.c</in>
+      <in>resample.c</in>
+      <in>slimproto.c</in>
+      <in>slimproto.h</in>
+      <in>squeezelite.h</in>
+      <in>stream.c</in>
+      <in>utils.c</in>
+      <in>vorbis.c</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>3</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>

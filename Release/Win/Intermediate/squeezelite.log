@@ -1,0 +1,197 @@
+﻿Build started 28/11/2015 17.33.15.
+     1>Project "G:\Sviluppo\squeezelite-R2\squeezelite.vcxproj" on node 2 (build target(s)).
+     1>C:\Programmi\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(298,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
+     1>C:\Programmi\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(299,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+     1>InitializeBuildStatus:
+         Creating "Release\Win\Intermediate\squeezelite-R2.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Programmi\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oy- /D WIN32 /D NDEBUG /D _CONSOLE /D RESAMPLE /D FFMPEG /D DSD /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\Win\Intermediate\\" /Fd"Release\Win\Intermediate\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt buffer.c decode.c dop.c dsd.c dsd2pcm\dsd2pcm.c faad.c ffmpeg.c flac.c ir.c mad.c main.c mpg.c output.c output_alsa.c output_pa.c output_pack.c output_stdout.c output_vis.c pcm.c process.c resample.c slimproto.c stream.c utils.c vorbis.c
+         buffer.c
+         decode.c
+         dop.c
+         dsd.c
+     1>dsd.c(190): warning C4018: '>=' : signed/unsigned mismatch
+     1>dsd.c(239): warning C4018: '<' : signed/unsigned mismatch
+     1>dsd.c(250): warning C4244: '=' : conversion from 'u64_t' to 'frames_t', possible loss of data
+     1>dsd.c(395): warning C4244: '=' : conversion from 'u64_t' to 'frames_t', possible loss of data
+         dsd2pcm.c
+         faad.c
+     1>faad.c(267): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(325) : see declaration of 'sscanf'
+         ffmpeg.c
+     1>ffmpeg.c(166): warning C4018: '<' : signed/unsigned mismatch
+     1>ffmpeg.c(183): warning C4018: '<' : signed/unsigned mismatch
+     1>ffmpeg.c(204): warning C4018: '<' : signed/unsigned mismatch
+     1>ffmpeg.c(240): warning C4018: '<' : signed/unsigned mismatch
+     1>ffmpeg.c(305): warning C4018: '<' : signed/unsigned mismatch
+     1>ffmpeg.c(586): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+     1>ffmpeg.c(593): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+     1>ffmpeg.c(600): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+         flac.c
+         ir.c
+         mad.c
+         main.c
+     1>main.c(251): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>main.c(252): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>main.c(318): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>main.c(319): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>main.c(349): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>main.c(352): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>main.c(377): warning C4018: '>' : signed/unsigned mismatch
+     1>main.c(377): warning C4018: '<' : signed/unsigned mismatch
+     1>main.c(533): warning C4996: 'freopen': This function or variable may be unsafe. Consider using freopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(249) : see declaration of 'freopen'
+     1>main.c(534): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+         mpg.c
+     1>G:\Sviluppo\squeezelite-R2\include\mpg123.h(14): warning C4091: 'typedef ' : ignored on left of 'long' when no variable is declared
+         output.c
+     1>output.c(161): warning C4018: '<' : signed/unsigned mismatch
+     1>output.c(177): warning C4018: '<' : signed/unsigned mismatch
+     1>output.c(214): warning C4018: '<' : signed/unsigned mismatch
+     1>output.c(407): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+     1>output.c(408): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+         output_alsa.c
+         output_pa.c
+     1>output_pa.c(97): warning C4996: '_snprintf': This function or variable may be unsafe. Consider using _snprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(363) : see declaration of '_snprintf'
+         output_pack.c
+         output_stdout.c
+         output_vis.c
+         pcm.c
+         process.c
+         Generating Code...
+         Compiling...
+         resample.c
+         slimproto.c
+     1>slimproto.c(102): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>slimproto.c(428): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(188) : see declaration of 'strncpy'
+     1>slimproto.c(435): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>slimproto.c(463): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>slimproto.c(464): warning C4996: 'strncat': This function or variable may be unsafe. Consider using strncat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(175) : see declaration of 'strncat'
+     1>slimproto.c(530): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>slimproto.c(545): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>slimproto.c(807): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(188) : see declaration of 'strncpy'
+     1>slimproto.c(814): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>slimproto.c(834): warning C4996: '_snprintf': This function or variable may be unsafe. Consider using _snprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(363) : see declaration of '_snprintf'
+     1>slimproto.c(838): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>slimproto.c(839): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>slimproto.c(894): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>slimproto.c(899): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+         stream.c
+     1>stream.c(54): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>stream.c(107): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>stream.c(158): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>stream.c(200): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>stream.c(217): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>stream.c(253): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>stream.c(345): warning C4996: '_open': This function or variable may be unsafe. Consider using _sopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\io.h(235) : see declaration of '_open'
+         utils.c
+     1>utils.c(51): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+     1>utils.c(225): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>utils.c(226): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>utils.c(346): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Programmi\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+         vorbis.c
+         Generating Code...
+       ManifestResourceCompile:
+         C:\Programmi\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Release\Win\Intermediate\squeezelite-R2.exe.embed.manifest.res" Release\Win\Intermediate\squeezelite-R2_manifest.rc 
+       Link:
+         C:\Programmi\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"Release\Win\Final\squeezelite-R2.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\Win\Intermediate\squeezelite-R2.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"G:\Sviluppo\squeezelite-R2\Release\Win\Final\squeezelite-R2.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Release\Win\Final\squeezelite-R2.lib" /MACHINE:X86 "Release\Win\Intermediate\squeezelite-R2.exe.embed.manifest.res"
+         Release\Win\Intermediate\buffer.obj
+         Release\Win\Intermediate\decode.obj
+         Release\Win\Intermediate\dop.obj
+         Release\Win\Intermediate\dsd.obj
+         Release\Win\Intermediate\dsd2pcm.obj
+         Release\Win\Intermediate\faad.obj
+         Release\Win\Intermediate\ffmpeg.obj
+         Release\Win\Intermediate\flac.obj
+         Release\Win\Intermediate\ir.obj
+         Release\Win\Intermediate\mad.obj
+         Release\Win\Intermediate\main.obj
+         Release\Win\Intermediate\mpg.obj
+         Release\Win\Intermediate\output.obj
+         Release\Win\Intermediate\output_alsa.obj
+         Release\Win\Intermediate\output_pa.obj
+         Release\Win\Intermediate\output_pack.obj
+         Release\Win\Intermediate\output_stdout.obj
+         Release\Win\Intermediate\output_vis.obj
+         Release\Win\Intermediate\pcm.obj
+         Release\Win\Intermediate\process.obj
+         Release\Win\Intermediate\resample.obj
+         Release\Win\Intermediate\slimproto.obj
+         Release\Win\Intermediate\stream.obj
+         Release\Win\Intermediate\utils.obj
+         Release\Win\Intermediate\vorbis.obj
+         include\portaudio.lib
+         include\WS2_32.Lib
+     1>LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/OPT:ICF' specification
+       Manifest:
+         C:\Programmi\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Release\Win\Intermediate\squeezelite-R2.exe.embed.manifest" /manifest "Release\Win\Intermediate\squeezelite-R2.exe.intermediate.manifest"
+         C:\Programmi\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Release\Win\Intermediate\squeezelite-R2.exe.embed.manifest.res" Release\Win\Intermediate\squeezelite-R2_manifest.rc 
+       LinkEmbedManifest:
+         C:\Programmi\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"Release\Win\Final\squeezelite-R2.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\Win\Intermediate\squeezelite-R2.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"G:\Sviluppo\squeezelite-R2\Release\Win\Final\squeezelite-R2.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Release\Win\Final\squeezelite-R2.lib" /MACHINE:X86 "Release\Win\Intermediate\squeezelite-R2.exe.embed.manifest.res"
+         Release\Win\Intermediate\buffer.obj
+         Release\Win\Intermediate\decode.obj
+         Release\Win\Intermediate\dop.obj
+         Release\Win\Intermediate\dsd.obj
+         Release\Win\Intermediate\dsd2pcm.obj
+         Release\Win\Intermediate\faad.obj
+         Release\Win\Intermediate\ffmpeg.obj
+         Release\Win\Intermediate\flac.obj
+         Release\Win\Intermediate\ir.obj
+         Release\Win\Intermediate\mad.obj
+         Release\Win\Intermediate\main.obj
+         Release\Win\Intermediate\mpg.obj
+         Release\Win\Intermediate\output.obj
+         Release\Win\Intermediate\output_alsa.obj
+         Release\Win\Intermediate\output_pa.obj
+         Release\Win\Intermediate\output_pack.obj
+         Release\Win\Intermediate\output_stdout.obj
+         Release\Win\Intermediate\output_vis.obj
+         Release\Win\Intermediate\pcm.obj
+         Release\Win\Intermediate\process.obj
+         Release\Win\Intermediate\resample.obj
+         Release\Win\Intermediate\slimproto.obj
+         Release\Win\Intermediate\stream.obj
+         Release\Win\Intermediate\utils.obj
+         Release\Win\Intermediate\vorbis.obj
+         include\portaudio.lib
+         include\WS2_32.Lib
+     1>LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/OPT:ICF' specification
+         squeezelite.vcxproj -> G:\Sviluppo\squeezelite-R2\Release\Win\Final\squeezelite-R2.exe
+       FinalizeBuildStatus:
+         Deleting file "Release\Win\Intermediate\squeezelite-R2.unsuccessfulbuild".
+         Touching "Release\Win\Intermediate\squeezelite-R2.lastbuildstate".
+     1>Done Building Project "G:\Sviluppo\squeezelite-R2\squeezelite.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:16.68

@@ -1,0 +1,1 @@
+squeezelite-R2 -n Squeezelite-R2@WIN -d all=info -f "C:\Documents and Settings\All Users\Dati applicazioni\SqueezeLite-R2\log\squeezelite-R2.log"

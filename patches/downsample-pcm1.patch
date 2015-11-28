@@ -1,0 +1,142 @@
+From 740a3b2de3689b5413ad757808ffe3f23da371af Mon Sep 17 00:00:00 2001
+From: marco <marco@pc>
+Date: 30-set-2015 12.21.02
+
+Added Source reference text and some better detailed log message
+
+diff --git a/LICENSE.txt b/LICENSE.txt
+index 94af310..2ec37c2 100644
+--- a/LICENSE.txt
++++ b/LICENSE.txt
+@@ -1,49 +1,51 @@
+-Squeezelite - lightweight headless squeezebox emulator
+-
+-(c) Adrian Smith 2012-2015, triode1@btinternet.com
+-
+-Released under GPLv3 license:
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program. If not, see <http://www.gnu.org/licenses/>.
+-
+-
+----------------------------------------------------------------------
+-
+-If built with DSD support, this software also includes code subject to the following license:
+-
+-Copyright 2009, 2011 Sebastian Gesemann. All rights reserved.
+-
+-Redistribution and use in source and binary forms, with or without modification, are
+-permitted provided that the following conditions are met:
+-
+-   1. Redistributions of source code must retain the above copyright notice, this list of
+-      conditions and the following disclaimer.
+-
+-   2. Redistributions in binary form must reproduce the above copyright notice, this list
+-      of conditions and the following disclaimer in the documentation and/or other materials
+-      provided with the distribution.
+-
+-THIS SOFTWARE IS PROVIDED BY SEBASTIAN GESEMANN ''AS IS'' AND ANY EXPRESS OR IMPLIED
+-WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+-FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SEBASTIAN GESEMANN OR
+-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+-ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+-ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-
+-The views and conclusions contained in the software and documentation are those of the
+-authors and should not be interpreted as representing official policies, either expressed
+-or implied, of Sebastian Gesemann.
++Modified version of:
++--------------------------------------------------------
++Squeezelite - lightweight headless squeezebox emulator
++
++(c) Adrian Smith 2012-2015, triode1@btinternet.com
++
++Released under GPLv3 license:
++
++This program is free software: you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation, either version 3 of the License, or
++(at your option) any later version.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with this program. If not, see <http://www.gnu.org/licenses/>.
++
++
++---------------------------------------------------------------------
++
++If built with DSD support, this software also includes code subject to the following license:
++
++Copyright 2009, 2011 Sebastian Gesemann. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without modification, are
++permitted provided that the following conditions are met:
++
++   1. Redistributions of source code must retain the above copyright notice, this list of
++      conditions and the following disclaimer.
++
++   2. Redistributions in binary form must reproduce the above copyright notice, this list
++      of conditions and the following disclaimer in the documentation and/or other materials
++      provided with the distribution.
++
++THIS SOFTWARE IS PROVIDED BY SEBASTIAN GESEMANN ''AS IS'' AND ANY EXPRESS OR IMPLIED
++WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
++FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SEBASTIAN GESEMANN OR
++CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
++SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
++ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
++NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
++ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++
++The views and conclusions contained in the software and documentation are those of the
++authors and should not be interpreted as representing official policies, either expressed
++or implied, of Sebastian Gesemann.
+diff --git a/main.c b/main.c
+index 5f3d48c..19f8b2a 100644
+--- a/main.c
++++ b/main.c
+@@ -40,7 +40,9 @@
+ #define CODECS CODECS_BASE CODECS_FF CODECS_DSD CODECS_MP3
+ 
+ static void usage(const char *argv0) {
+-	printf(TITLE " See -t for license terms\n"
++	printf(TITLE
++              "modified version, see https://github.com/marcoc1712/squeezelite/tree/mc2_wav_resample"
++		   " See -t for license terms\n"
+ 		   "Usage: %s [options]\n"
+ 		   "  -s <server>[:<port>]\tConnect to specified server, otherwise uses autodiscovery to find server\n"
+ 		   "  -o <output device>\tSpecify output device, default \"default\", - = output to stdout\n"
+diff --git a/pcm.c b/pcm.c
+index 1db6960..74ce5d1 100644
+--- a/pcm.c
++++ b/pcm.c
+@@ -153,8 +153,10 @@
+ 			}
+ 		}
+ 
+-	} else {
++	} else if (stream.state == STREAMING_FILE) {
+ 		LOG_WARN("unknown format - can't parse header");
++	} else {
++		LOG_INFO("unknown format - can't parse header, using server parameters");
+ 	}
+ }
+ 
