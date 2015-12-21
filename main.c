@@ -83,7 +83,7 @@ static void usage(const char *argv0) {
 #endif
 		   "  -r <rates>[:<delay>]\tSample rates supported, allows output to be off when squeezelite is started; rates = <maxrate>|<minrate>-<maxrate>|<rate1>,<rate2>,<rate3>; delay = optional delay switching rates in ms\n"
 #if RESAMPLE
-		   "  -h \t\t\tDisable LMS side downsampling\n"
+		   "  -x \t\t\tDisable LMS side downsampling\n"
 		   "  -R -u [params]\tResample, params = <recipe>:<flags>:<attenuation>:<precision>:<passband_end>:<stopband_start>:<phase_response>,\n" 
 		   "  \t\t\t recipe = (v|h|m|l|q)(L|I|M)(s) [E|X], E = exception - resample only if native rate not supported, X = async - resample to max rate for device, otherwise to max sync rate\n"
 		   "  \t\t\t flags = num in hex,\n"
@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
 						  "L"
 #endif
 #if RESAMPLE
-						  "huR"
+						  "uxR"
 #endif
 #if DSD
 						  "D"
@@ -437,7 +437,7 @@ int main(int argc, char **argv) {
 			break;
 #endif
 #if RESAMPLE
-		case 'h':
+		case 'x':
 			lms_downsample = false;
 			break;
 		case 'u':
