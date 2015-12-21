@@ -1,7 +1,7 @@
 # Cross compile support - create a Makefile which defines these three variables and then includes this Makefile...
 CFLAGS  ?= -Wall -fPIC -O2 $(OPTS)
 LDFLAGS ?= -lasound -lpthread -lm -lrt
-EXECUTABLE ?= squeezelite
+EXECUTABLE ?= squeezelite-R2
 
 # passing one or more of these in $(OPTS) enables optional feature inclusion
 OPT_DSD     = -DDSD

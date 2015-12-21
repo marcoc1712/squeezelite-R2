@@ -143,4 +143,13 @@ First R2 release.
 
 Features
 - Allow server side upsampling for PCM streams (always read the header).
-- disable LMS downsampling using -x option. (thanks to Daphile).
+- disable LMS downsampling using -h option. (thanks to Daphile).
+
+
+Version 1.8.2 (R2) 21/12/15
+===========================
+
+No new Features.
+- Replaced option -h with -x according to the pach released by Daphile.
+- Minor changes in makefiles.
+ 
