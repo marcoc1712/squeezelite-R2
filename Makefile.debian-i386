@@ -1,0 +1,4 @@
+OPTS= -DLINUX -DALSA -DDSD -DFFMPEG -DRESAMPLE -DVISEXPORT
+EXECUTABLE ?= squeezelite-R2-deb-i386
+
+include Makefile
