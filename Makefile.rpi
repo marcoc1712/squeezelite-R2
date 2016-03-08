@@ -1,0 +1,6 @@
+OPTS = -DRESAMPLE -DFFMPEG -DVISEXPORT -DDSD -DIR -I./include
+CFLAGS  ?= -Wall -fPIC -s -O3 -march=armv6 -mfloat-abi=hard -mfpu=vfp $(OPTS)
+LDFLAGS ?= -s -lasound -lpthread -lm -ldl -lrt -Wl,-rpath,/usr/local/lib
+EXECUTABLE ?= squeezelite-rpi
+
+include Makefile
