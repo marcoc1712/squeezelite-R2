@@ -8,6 +8,7 @@ in order to override the wrong information coming form the server when transcodi
 after upsampling on LMS.
 
 Since october, 4 2015 this mod has been incorporated in Daphile.
+
 Since march,  10 20616 this mod has been incorporated in Auidiolinux.
 Since march,  15 20616 this mod has been incorporated in the squeezebox community official version of squeezelite, mantained by Ralph Irving.
 
