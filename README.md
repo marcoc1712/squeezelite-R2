@@ -7,9 +7,10 @@ This version was originally meant to always inspect pcm headers (if awaillable) 
 in order to override the wrong information coming form the server when transcoding or upsampling, this  way you could save encodind 
 after upsampling on LMS.
 
-Since october 4 2015 this mod has been incorporated in Daphile.
+Since october, 4 2015 this mod has been incorporated in Daphile.
+Since march,  10 20616 this mod has been incorporated in Auidiolinux.
+Since march,  15 20616 this mod has been incorporated in the squeezebox community official version of squeezelite, mantained by Ralph Irving.
 
-It now incorporate an original patch from Daphile: Launched with -h prevent lms to downsample in case original samplerate is greater 
-than the maximum imposed with -r in command line. 
+Squeezelite-R2 now incorporate an original patch from Daphile: Launched with -x prevent lms to downsample in case original samplerate is greater than the maximum imposed with -r in command line. 
 
 This is a safety option, becouse LMS could not actually downsample pcm.
