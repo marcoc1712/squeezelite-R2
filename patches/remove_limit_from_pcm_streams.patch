@@ -1,0 +1,42 @@
+diff --git a/pcm.c b/pcm.c
+index 8af40b9..cea071d 100644
+--- a/pcm.c
++++ b/pcm.c
+@@ -103,20 +103,30 @@
+ 			if (format == WAVE && !memcmp(ptr, "data", 4)) {
+ 				ptr += 8;
+ 				_buf_inc_readp(streambuf, ptr - streambuf->readp);
+-				audio_left = len;
+-				LOG_INFO("audio size: %u", audio_left);
+-				limit = true;
++				
++				// Reading from an upsampled stream  lenght coul dbe wrong.
++				// read until EOF this way.
++				if (stream.state == STREAMING_FILE){
++					audio_left = len;
++					LOG_INFO("audio size: %u", audio_left);
++					limit = true;
++				}
+ 				return;
+ 			}
+-
++			
+ 			if (format == AIFF && !memcmp(ptr, "SSND", 4) && bytes >= 16) {
+ 				unsigned offset = *(ptr+8) << 24 | *(ptr+9) << 16 | *(ptr+10) << 8 | *(ptr+11);
+ 				// following 4 bytes is blocksize - ignored
+ 				ptr += 8 + 8;
+ 				_buf_inc_readp(streambuf, ptr + offset - streambuf->readp);
+-				audio_left = len - 8 - offset;
+-				LOG_INFO("audio size: %u", audio_left);
+-				limit = true;
++				
++				// Reading from an upsampled stream  lenght coul dbe wrong.
++				// read until EOF this way.
++				if (stream.state == STREAMING_FILE){
++					audio_left = len - 8 - offset;
++					LOG_INFO("audio size: %u", audio_left);
++					limit = true;
++				}
+ 				return;
+ 			}
+ 

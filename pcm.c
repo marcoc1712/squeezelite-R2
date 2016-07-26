@@ -103,20 +103,34 @@ static void _check_header(void) {
 			if (format == WAVE && !memcmp(ptr, "data", 4)) {
 				ptr += 8;
 				_buf_inc_readp(streambuf, ptr - streambuf->readp);
-				audio_left = len;
-				LOG_INFO("audio size: %u", audio_left);
-				limit = true;
+				
+                                // len could be wrong for stream, reading up to EOF.
+				if (stream.state == STREAMING_FILE){
+					audio_left = len;
+					LOG_INFO("audio size: %u", audio_left);
+					limit = true;
+				}else {
+                                
+                                    LOG_INFO("unknown or invalid audio size, reading up to EOF");
+                                }
 				return;
 			}
-
+			
 			if (format == AIFF && !memcmp(ptr, "SSND", 4) && bytes >= 16) {
 				unsigned offset = *(ptr+8) << 24 | *(ptr+9) << 16 | *(ptr+10) << 8 | *(ptr+11);
 				// following 4 bytes is blocksize - ignored
 				ptr += 8 + 8;
 				_buf_inc_readp(streambuf, ptr + offset - streambuf->readp);
-				audio_left = len - 8 - offset;
-				LOG_INFO("audio size: %u", audio_left);
-				limit = true;
+				
+				// len could be wrong for stream, reading up to EOF.
+				if (stream.state == STREAMING_FILE){
+					audio_left = len - 8 - offset;
+					LOG_INFO("audio size: %u", audio_left);
+					limit = true;
+				} else {
+                                
+                                    LOG_INFO("unknown or invalid audio size, reading up to EOF");
+                                }
 				return;
 			}
 
