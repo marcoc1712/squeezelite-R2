@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{32B86D26-9B98-43BC-86D6-CAE686439A46}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>squeezelite-R2</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <UseOfAtl>false</UseOfAtl>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <ReferencePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">G:\Sviluppo\squeezelite\lib;$(ReferencePath)</ReferencePath>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <ReferencePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">G:\Sviluppo\squeezelite-R2\lib;$(ReferencePath)</ReferencePath>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\Win\Final</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\Win\Intermediate</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</LinkIncremental>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">G:\Sviluppo\squeezelite-R2\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">G:\Sviluppo\squeezelite-R2\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">G:\Sviluppo\squeezelite\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">G:\Sviluppo\squeezelite\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;RESAMPLE;FFMPEG;DSD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Programmi\Microsoft SDKs\Windows\v6.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;RESAMPLE;FFMPEG;DSD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="dsd2pcm\dsd2pcm.h" />
+    <ClInclude Include="include\inttypes.h" />
+    <ClInclude Include="include\mad.h" />
+    <ClInclude Include="include\mpg123.h" />
+    <ClInclude Include="include\soxr.h" />
+    <ClInclude Include="include\stdint.h" />
+    <ClInclude Include="neaacdec.h" />
+    <ClInclude Include="include\neaacdec.h" />
+    <ClInclude Include="include\pa_asio.h" />
+    <ClInclude Include="include\pa_jack.h" />
+    <ClInclude Include="include\pa_linux_alsa.h" />
+    <ClInclude Include="include\pa_mac_core.h" />
+    <ClInclude Include="include\pa_win_ds.h" />
+    <ClInclude Include="include\pa_win_wasapi.h" />
+    <ClInclude Include="include\pa_win_waveformat.h" />
+    <ClInclude Include="include\pa_win_wdmks.h" />
+    <ClInclude Include="include\pa_win_wmme.h" />
+    <ClInclude Include="include\portaudio.h" />
+    <ClInclude Include="slimproto.h" />
+    <ClInclude Include="squeezelite.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="buffer.c" />
+    <ClCompile Include="decode.c" />
+    <ClCompile Include="dop.c" />
+    <ClCompile Include="dsd.c" />
+    <ClCompile Include="dsd2pcm\dsd2pcm.c" />
+    <ClCompile Include="faad.c" />
+    <ClCompile Include="ffmpeg.c" />
+    <ClCompile Include="flac.c" />
+    <ClCompile Include="ir.c" />
+    <ClCompile Include="mad.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="mpg.c" />
+    <ClCompile Include="output.c" />
+    <ClCompile Include="output_alsa.c" />
+    <ClCompile Include="output_pa.c" />
+    <ClCompile Include="output_pack.c" />
+    <ClCompile Include="output_stdout.c" />
+    <ClCompile Include="output_vis.c" />
+    <ClCompile Include="pcm.c" />
+    <ClCompile Include="process.c" />
+    <ClCompile Include="resample.c" />
+    <ClCompile Include="slimproto.c" />
+    <ClCompile Include="stream.c" />
+    <ClCompile Include="utils.c" />
+    <ClCompile Include="vorbis.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dsd2pcm\LICENSE.txt" />
+    <None Include="lib\libfaad2.dll" />
+    <None Include="lib\libFLAC.dll" />
+    <None Include="lib\libmpg123-0.dll" />
+    <None Include="lib\libsoxr.dll" />
+    <None Include="include\mpg123.h.in" />
+    <None Include="lib\portaudio.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="include\portaudio.lib" />
+    <Library Include="include\WS2_32.Lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

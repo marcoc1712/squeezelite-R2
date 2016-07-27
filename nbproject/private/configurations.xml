@@ -183,6 +183,12 @@
       </df>
       <df name="lib_osx">
       </df>
+      <df name="msVC">
+        <df name="Debug">
+        </df>
+        <df name="Release">
+        </df>
+      </df>
       <df name="patches">
       </df>
       <df name="scripts">
@@ -221,7 +227,7 @@
     <conf name="Default" type="0">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compile>
         <compiledirpicklist>
