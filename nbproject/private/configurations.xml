@@ -183,13 +183,15 @@
       </df>
       <df name="lib_osx">
       </df>
-      <df name="msVC">
-        <df name="Debug">
-        </df>
-        <df name="Release">
-        </df>
-      </df>
       <df name="patches">
+      </df>
+      <df name="Release">
+        <df name="Win">
+          <df name="Final">
+          </df>
+          <df name="Intermediate">
+          </df>
+        </df>
       </df>
       <df name="scripts">
         <in>setrpath.c</in>
