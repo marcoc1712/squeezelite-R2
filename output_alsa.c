@@ -842,7 +842,7 @@ void output_init_alsa(log_level level, const char *device, unsigned output_buf_s
 		if (!strcmp(alsa_sample_fmt, "16")) alsa.format = SND_PCM_FORMAT_S16_LE;
 	}
 
-	LOG_INFO("requested alsa_buffer: %u alsa_period: %u format: %s mmap: %u", output.buffer, output.period, 
+	LOG_INFO("device : %s requested alsa_buffer: %u alsa_period: %u format: %s mmap: %u", device, output.buffer, output.period, 
 			 alsa_sample_fmt ? alsa_sample_fmt : "any", alsa.mmap);
 
 	snd_lib_error_set_handler((snd_lib_error_handler_t)alsa_error_handler);

@@ -97,7 +97,7 @@ static void *output_thread() {
 	UNLOCK;
 
 	while (running) {
-
+		
 		LOCK;
 
 		output.device_frames = 0;
