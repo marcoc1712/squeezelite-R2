@@ -215,20 +215,25 @@ static decode_state pcm_decode(void) {
 		LOCK_O_not_direct;
 		output.track_start = outputbuf->writep;
 		decode.new_stream = false;
-		output.next_sample_rate = decode_newstream(sample_rate, output.supported_rates);
 #if DSD
 		if (sample_size == 3 &&
 			is_stream_dop(((u8_t *)streambuf->readp) + (bigendian?0:2),
 						  ((u8_t *)streambuf->readp) + (bigendian?0:2) + sample_size,
 						  sample_size * channels, bytes / (sample_size * channels))) {
 			LOG_INFO("file contains DOP");
-			output.next_fmt = DOP;
+			if (output.dsdfmt == DOP_S24_LE || output.dsdfmt == DOP_S24_3LE)
+				output.next_fmt = output.dsdfmt;
+			else
+				output.next_fmt = DOP;
+			output.next_sample_rate = sample_rate;
 			output.fade = FADE_INACTIVE;
 		} else {
+			output.next_sample_rate = decode_newstream(sample_rate, output.supported_rates);
 			output.next_fmt = PCM;
 			if (output.fade_mode) _checkfade(true);
 		}
 #else
+		output.next_sample_rate = decode_newstream(sample_rate, output.supported_rates);
 		if (output.fade_mode) _checkfade(true);
 #endif
 		UNLOCK_O_not_direct;

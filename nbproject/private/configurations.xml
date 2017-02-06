@@ -5,6 +5,7 @@
       <df name="Bin">
       </df>
       <df name="Daphile patches">
+        <in>00-Applied_patch</in>
         <in>01-faad-optional.patch</in>
         <in>02-check_header_on_wav+aiff_streaming.patch</in>
         <in>03-multi-channel-pcm.patch</in>
@@ -19,6 +20,8 @@
         <in>12-unknown_wav_size.patch</in>
         <in>13-remove_last_block_zero_padding.patch</in>
         <in>14-disable_dop_wav_resampling.patch</in>
+      </df>
+      <df name="Debug">
       </df>
       <df name="dsd2pcm">
         <in>dsd2pcm.c</in>

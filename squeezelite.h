@@ -518,7 +518,7 @@ typedef enum { OUTPUT_OFF = -1, OUTPUT_STOPPED = 0, OUTPUT_BUFFER, OUTPUT_RUNNIN
 			   OUTPUT_PAUSE_FRAMES, OUTPUT_SKIP_FRAMES, OUTPUT_START_AT } output_state;
 
 #if DSD
-typedef enum { PCM, DOP, DSD_U8, DSD_U16_LE, DSD_U32_LE, DSD_U16_BE, DSD_U32_BE } dsd_format;
+typedef enum { PCM, DOP, DSD_U8, DSD_U16_LE, DSD_U32_LE, DSD_U16_BE, DSD_U32_BE, DOP_S24_LE, DOP_S24_3LE } dsd_format;
 typedef enum { S32_LE, S24_LE, S24_3LE, S16_LE, U8, U16_LE, U16_BE, U32_LE, U32_BE } output_format;
 #else
 typedef enum { S32_LE, S24_LE, S24_3LE, S16_LE } output_format;

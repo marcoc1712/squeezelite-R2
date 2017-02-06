@@ -424,6 +424,10 @@ static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buf
 		alsa.format = SND_PCM_FORMAT_DSD_U32_LE; break;
 	case DSD_U32_BE:
 		alsa.format = SND_PCM_FORMAT_DSD_U32_BE; break;
+	case DOP_S24_LE:
+		alsa.format = SND_PCM_FORMAT_S24_LE; break;
+	case DOP_S24_3LE:
+		alsa.format = SND_PCM_FORMAT_S24_3LE; break;
 	default:
 		alsa.format = alsa.pcmfmt;
 	}
@@ -597,7 +601,7 @@ static int _write_frames(frames_t out_frames, bool silence, s32_t gainL, s32_t g
 			if (silence) {
 				inputptr = (s32_t *) silencebuf_dsd;
 			}
-			if (output.outfmt == DOP)
+			if (output.outfmt == DOP || output.outfmt == DOP_S24_LE || output.outfmt == DOP_S24_3LE)
 				update_dop((u32_t *) inputptr, out_frames, output.invert && !silence);
 			else if (output.invert && !silence)
 				dsd_invert((u32_t *) inputptr, out_frames);

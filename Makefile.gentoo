@@ -76,7 +76,7 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 #	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
-      $(CC) $(OBJECTS) $(LDFLAGS) $(EXTRALIBS) -o $@
+      $(CC) $(OBJECTS) $(EXTRALIBS) -o $@
 
 $(OBJECTS): $(DEPS)
 

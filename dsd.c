@@ -211,6 +211,7 @@ static decode_state _decode_dsf(void) {
 	
 	unsigned bytes = _buf_used(streambuf);
 	unsigned block_left = d->block_size;
+	unsigned padding = 0;
 	
 	unsigned bytes_per_frame;
 	switch (outfmt) {
@@ -221,6 +222,8 @@ static decode_state _decode_dsf(void) {
 	case DSD_U16_LE:
 	case DSD_U16_BE:
 	case DOP:
+	case DOP_S24_LE:
+	case DOP_S24_3LE:
 		bytes_per_frame = 2;
 		break;
 	default:
@@ -249,6 +252,22 @@ static decode_state _decode_dsf(void) {
 			iptrr -= streambuf->size;
 		}
 		
+		// Remove zero padding from last block in case of inaccurate sample count 
+		if ((_buf_used(streambuf) == d->block_size * d->channels)
+			&& (d->sample_bytes > _buf_used(streambuf))) {
+			int i;
+			u8_t *ipl, *ipr;
+			for (i = d->block_size - 1; i > 0; i--) {
+				ipl = iptrl + i;
+				if (ipl >= streambuf->wrap) ipl -= streambuf->size;
+				ipr = iptrr + i;	
+				if (ipr >= streambuf->wrap) ipr -= streambuf->size;
+				if (*ipl || *ipr) break;
+				padding++;
+			}
+			block_left -= padding;
+		}
+
 		bytes = min(block_left, min(streambuf->wrap - iptrl, streambuf->wrap - iptrr));
 
 		IF_DIRECT(
@@ -398,6 +417,8 @@ static decode_state _decode_dsf(void) {
 			break;
 
 		case DOP:
+		case DOP_S24_LE:
+		case DOP_S24_3LE:
 			
 			if (d->channels == 1) {
 				if (d->lsb_first) {
@@ -488,6 +509,11 @@ static decode_state _decode_dsf(void) {
 		LOG_SDEBUG("write %u frames", frames);
 	}
 	
+	if (padding) {
+		_buf_inc_readp(streambuf, padding);
+		LOG_INFO("Zero padding removed: %u bytes", padding);
+	}
+	
 	// skip the other channel blocks
 	// the right channel has already been read and is guarenteed to be in streambuf so can be skipped immediately
 	if (d->channels > 1) {
@@ -528,6 +554,8 @@ static decode_state _decode_dsdiff(void) {
 	case DSD_U16_LE:
 	case DSD_U16_BE:
 	case DOP:
+	case DOP_S24_LE:
+	case DOP_S24_3LE:
 		bytes_per_frame = d->channels * 2;
 		break;
 	default:
@@ -624,6 +652,8 @@ static decode_state _decode_dsdiff(void) {
 		break;
 		
 	case DOP:
+	case DOP_S24_LE:
+	case DOP_S24_3LE:
 		
 		if (d->channels == 1) {
 			while (count--) {
@@ -760,6 +790,14 @@ static decode_state dsd_decode(void) {
 			break;
 		case DOP:
 			fmtstr = "DOP";
+			output.next_sample_rate = d->sample_rate / 16;
+			break;
+		case DOP_S24_LE:
+			fmtstr = "DOP_S24_LE";
+			output.next_sample_rate = d->sample_rate / 16;
+			break;
+		case DOP_S24_3LE:
+			fmtstr = "DOP_S24_3LE";
 			output.next_sample_rate = d->sample_rate / 16;
 			break;
 		case PCM:

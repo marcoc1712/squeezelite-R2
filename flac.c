@@ -125,7 +125,10 @@ static FLAC__StreamDecoderWriteStatus write_cb(const FLAC__StreamDecoder *decode
 #endif		
 		if (bits_per_sample == 24 && is_stream_dop(((u8_t *)lptr) + MARKER_OFFSET, ((u8_t *)rptr) + MARKER_OFFSET, 4, frames)) {
 			LOG_INFO("file contains DOP");
-			output.next_fmt = DOP;
+			if (output.dsdfmt == DOP_S24_LE || output.dsdfmt == DOP_S24_3LE)
+				output.next_fmt = output.dsdfmt;
+			else
+				output.next_fmt = DOP;
 			output.next_sample_rate = frame->header.sample_rate;
 			output.fade = FADE_INACTIVE;
 		} else {

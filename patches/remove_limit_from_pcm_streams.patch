@@ -10,7 +10,7 @@ index 8af40b9..cea071d 100644
 -				LOG_INFO("audio size: %u", audio_left);
 -				limit = true;
 +				
-+				// Reading from an upsampled stream  lenght coul dbe wrong.
++				// Reading from an upsampled stream  lenght could be wrong.
 +				// read until EOF this way.
 +				if (stream.state == STREAMING_FILE){
 +					audio_left = len;

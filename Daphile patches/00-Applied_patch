@@ -1,0 +1,12 @@
+In version 1.8.4 were applied all paches in patches direcotry, that include:
+
+02-check_header_on_wav+aiff_streaming (by me, but older version).
+04-lms_downsampling_option+768kHz_maxrate-r2
+
+branch "Play_DSD_decoded_by_Mansr_sox" (future v. 1.8.5) include:
+
+07-native-dsd-support
+10-24bit_dop_formats
+13-remove_last_block_zero_padding
+14-disable_dop_wav_resampling
+

@@ -3,6 +3,7 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
       <df name="Daphile patches">
+        <in>00-Applied_patch</in>
         <in>01-faad-optional.patch</in>
         <in>02-check_header_on_wav+aiff_streaming.patch</in>
         <in>03-multi-channel-pcm.patch</in>
@@ -71,6 +72,8 @@
           </ccTool>
         </makeTool>
       </makefileType>
+      <item path="Daphile patches/00-Applied_patch" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Daphile patches/01-faad-optional.patch"
             ex="false"
             tool="3"
