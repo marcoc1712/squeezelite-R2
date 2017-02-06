@@ -166,7 +166,7 @@ static void usage(const char *argv0) {
 
 static void license(void) {
 	printf(TITLE "\n" MODINFO "\n" MODINFO2 "\n"
-		   "-h option patch, to disable LMS downsampling, (c) 2015 Daphile\n\n"
+		   "-x option patch, to disable LMS downsampling, (c) 2015 Daphile\n\n"
 		   "This program is free software: you can redistribute it and/or modify\n"
 		   "it under the terms of the GNU General Public License as published by\n"
 		   "the Free Software Foundation, either version 3 of the License, or\n"
