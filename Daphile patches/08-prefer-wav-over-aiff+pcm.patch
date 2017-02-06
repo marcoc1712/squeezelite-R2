@@ -1,0 +1,12 @@
+diff -ruN '--exclude=.git' squeezelite-1.8.orig/pcm.c squeezelite-1.8/pcm.c
+--- squeezelite-1.8.orig/pcm.c	2015-10-18 11:29:21.710361752 +0000
++++ squeezelite-1.8/pcm.c	2015-10-18 15:00:40.831416654 +0000
+@@ -373,7 +373,7 @@
+ struct codec *register_pcm(void) {
+ 	static struct codec ret = { 
+ 		'p',         // id
+-		"aif,pcm",   // types
++		"wav,aif,pcm", // types
+ 		4096,        // min read
+ 		102400,      // min space
+ 		pcm_open,    // open

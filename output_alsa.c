@@ -44,6 +44,10 @@ static snd_pcm_format_t fmts[] = { SND_PCM_FORMAT_S32_LE, SND_PCM_FORMAT_S24_LE,
 static struct {
 	char device[MAX_DEVICE_LEN + 1];
 	snd_pcm_format_t format;
+#if DSD
+	dsd_format outfmt;
+	snd_pcm_format_t pcmfmt;
+#endif
 	snd_pcm_uframes_t buffer_size;
 	snd_pcm_uframes_t period_size;
 	unsigned rate;
@@ -58,7 +62,7 @@ static snd_pcm_t *pcmp = NULL;
 
 extern u8_t *silencebuf;
 #if DSD
-extern u8_t *silencebuf_dop;
+extern u8_t *silencebuf_dsd;
 #endif
 
 static log_level loglevel;
@@ -334,7 +338,11 @@ static bool pcm_probe(const char *device) {
 	return true;
 }
 
-static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buffer, unsigned alsa_period) {
+#if DSD
+static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buffer, unsigned alsa_period, dsd_format outfmt) {
+#else
+ static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buffer, unsigned alsa_period) {
+#endif
 	int err;
 	snd_pcm_hw_params_t *hw_params;
 	snd_pcm_hw_params_alloca(&hw_params);
@@ -344,6 +352,9 @@ static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buf
 
 	// reset params
 	alsa.rate = 0;
+#if DSD
+	alsa.outfmt = PCM;
+#endif
 	alsa.period_size = 0;
 	strcpy(alsa.device, device);
 
@@ -400,6 +411,24 @@ static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buf
 	}
 
 	// set the sample format
+	
+#if DSD
+	switch (outfmt) {
+	case DSD_U8:
+		alsa.format = SND_PCM_FORMAT_DSD_U8; break;
+	case DSD_U16_LE:
+		alsa.format = SND_PCM_FORMAT_DSD_U16_LE; break;
+	case DSD_U16_BE:
+		alsa.format = SND_PCM_FORMAT_DSD_U16_BE; break;
+	case DSD_U32_LE:
+		alsa.format = SND_PCM_FORMAT_DSD_U32_LE; break;
+	case DSD_U32_BE:
+		alsa.format = SND_PCM_FORMAT_DSD_U32_BE; break;
+	default:
+		alsa.format = alsa.pcmfmt;
+	}
+#endif
+		
 	snd_pcm_format_t *fmt = alsa.format ? &alsa.format : (snd_pcm_format_t *)fmts;
 	do {
 		if (snd_pcm_hw_params_set_format(pcmp, hw_params, *fmt) >= 0) {
@@ -428,6 +457,18 @@ static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buf
 		output.format = S24_3LE; break;
 	case SND_PCM_FORMAT_S16_LE: 
 		output.format = S16_LE; break;
+#if DSD
+	case SND_PCM_FORMAT_DSD_U32_LE:
+		output.format = U32_LE; break;
+	case SND_PCM_FORMAT_DSD_U32_BE:
+		output.format = U32_BE; break;
+	case SND_PCM_FORMAT_DSD_U16_LE:
+		output.format = U16_LE; break;
+	case SND_PCM_FORMAT_DSD_U16_BE:
+		output.format = U16_BE; break;
+	case SND_PCM_FORMAT_DSD_U8:
+		output.format = U8; break;
+#endif
 	default: 
 		break;
 	}
@@ -513,6 +554,10 @@ static int alsa_open(const char *device, unsigned sample_rate, unsigned alsa_buf
 	// this indicates we have opened the device ok
 	alsa.rate = sample_rate;
 
+#if DSD
+	alsa.outfmt = outfmt;
+#endif
+
 	return 0;
 }
 
@@ -548,11 +593,14 @@ static int _write_frames(frames_t out_frames, bool silence, s32_t gainL, s32_t g
 	inputptr = (s32_t *) (silence ? silencebuf : outputbuf->readp);
 
 	IF_DSD(
-		if (output.dop) {
+		if (output.outfmt != PCM) {
 			if (silence) {
-				inputptr = (s32_t *) silencebuf_dop;
+				inputptr = (s32_t *) silencebuf_dsd;
 			}
-			update_dop((u32_t *) inputptr, out_frames, output.invert && !silence);
+			if (output.outfmt == DOP)
+				update_dop((u32_t *) inputptr, out_frames, output.invert && !silence);
+			else if (output.invert && !silence)
+				dsd_invert((u32_t *) inputptr, out_frames);
 		}
 	)
 
@@ -634,17 +682,28 @@ static void *output_thread(void *arg) {
 			probe_device = false;
 		}
 
-		if (!pcmp || alsa.rate != output.current_sample_rate) {
+#if DSD
+		if (!pcmp || alsa.rate != output.current_sample_rate || alsa.outfmt != output.outfmt ) {
+#else
+ 		if (!pcmp || alsa.rate != output.current_sample_rate) {
+#endif
 			LOG_INFO("open output device: %s", output.device);
 			LOCK;
 
 			// FIXME - some alsa hardware requires opening twice for a new sample rate to work
 			// this is a workaround which should be removed
 			if (alsa.reopen) {
-				alsa_open(output.device, output.current_sample_rate, output.buffer, output.period);
+#if DSD
+				alsa_open(output.device, output.current_sample_rate, output.buffer, output.period, output.outfmt);
+#else
+ 				alsa_open(output.device, output.current_sample_rate, output.buffer, output.period);
+#endif
 			}
-
-			if (!!alsa_open(output.device, output.current_sample_rate, output.buffer, output.period)) {
+#if DSD
+			if (!!alsa_open(output.device, output.current_sample_rate, output.buffer, output.period, output.outfmt)) {
+#else
+ 			if (!!alsa_open(output.device, output.current_sample_rate, output.buffer, output.period)) {
+#endif
 				output.error_opening = true;
 				UNLOCK;
 				sleep(5);
@@ -820,7 +879,11 @@ void output_init_alsa(log_level level, const char *device, unsigned output_buf_s
 
 	alsa.mmap = alsa_mmap;
 	alsa.write_buf = NULL;
-	alsa.format = 0;
+#if DSD
+	alsa.pcmfmt = 0;
+#else
+ 	alsa.format = 0;
+#endif
 	alsa.reopen = alsa_reopen;
 
 	if (!mixer_unmute) {
@@ -836,10 +899,17 @@ void output_init_alsa(log_level level, const char *device, unsigned output_buf_s
 	output.rate_delay = rate_delay;
 
 	if (alsa_sample_fmt) {
+#if DSD
+		if (!strcmp(alsa_sample_fmt, "32"))	alsa.pcmfmt = SND_PCM_FORMAT_S32_LE;
+		if (!strcmp(alsa_sample_fmt, "24")) alsa.pcmfmt = SND_PCM_FORMAT_S24_LE;
+		if (!strcmp(alsa_sample_fmt, "24_3")) alsa.pcmfmt = SND_PCM_FORMAT_S24_3LE;
+		if (!strcmp(alsa_sample_fmt, "16")) alsa.pcmfmt = SND_PCM_FORMAT_S16_LE;
+#else
 		if (!strcmp(alsa_sample_fmt, "32"))	alsa.format = SND_PCM_FORMAT_S32_LE;
 		if (!strcmp(alsa_sample_fmt, "24")) alsa.format = SND_PCM_FORMAT_S24_LE;
 		if (!strcmp(alsa_sample_fmt, "24_3")) alsa.format = SND_PCM_FORMAT_S24_3LE;
 		if (!strcmp(alsa_sample_fmt, "16")) alsa.format = SND_PCM_FORMAT_S16_LE;
+#endif
 	}
 
 	LOG_INFO("device : %s requested alsa_buffer: %u alsa_period: %u format: %s mmap: %u", device, output.buffer, output.period, 

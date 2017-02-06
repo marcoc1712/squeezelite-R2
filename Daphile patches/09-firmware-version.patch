@@ -1,0 +1,11 @@
+--- squeezelite-1.8/squeezelite.h.orig	2015-11-16 12:06:16.424425965 +0000
++++ squeezelite-1.8/squeezelite.h	2015-11-16 12:07:48.621198993 +0000
+@@ -20,7 +20,7 @@
+ 
+ // make may define: PORTAUDIO, SELFPIPE, RESAMPLE, RESAMPLE_MP, VISEXPORT, IR, DSD, LINKALL to influence build
+ 
+-#define VERSION "v1.8"
++#define VERSION "v1.8+ (Daphile)"
+ 
+ #if !defined(MODEL_NAME)
+ #define MODEL_NAME SqueezeLite

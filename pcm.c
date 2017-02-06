@@ -213,11 +213,24 @@ static decode_state pcm_decode(void) {
 	if (decode.new_stream) {
 		LOG_INFO("setting track_start");
 		LOCK_O_not_direct;
-		output.next_sample_rate = decode_newstream(sample_rate, output.supported_rates);
 		output.track_start = outputbuf->writep;
-		IF_DSD( output.next_dop = false; )
-		if (output.fade_mode) _checkfade(true);
 		decode.new_stream = false;
+		output.next_sample_rate = decode_newstream(sample_rate, output.supported_rates);
+#if DSD
+		if (sample_size == 3 &&
+			is_stream_dop(((u8_t *)streambuf->readp) + (bigendian?0:2),
+						  ((u8_t *)streambuf->readp) + (bigendian?0:2) + sample_size,
+						  sample_size * channels, bytes / (sample_size * channels))) {
+			LOG_INFO("file contains DOP");
+			output.next_fmt = DOP;
+			output.fade = FADE_INACTIVE;
+		} else {
+			output.next_fmt = PCM;
+			if (output.fade_mode) _checkfade(true);
+		}
+#else
+		if (output.fade_mode) _checkfade(true);
+#endif
 		UNLOCK_O_not_direct;
 		IF_PROCESS(
 			out = process.max_in_frames;

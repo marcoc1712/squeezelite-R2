@@ -1,0 +1,31 @@
+diff -ruN squeezelite.orig/decode.c squeezelite/decode.c
+--- squeezelite.orig/decode.c	2014-07-29 10:54:01.884706029 +0300
++++ squeezelite/decode.c	2014-07-29 10:58:01.522912608 +0300
+@@ -138,7 +138,9 @@
+ 	if (!strstr(exclude_codecs, "alac") && (!include_codecs || strstr(include_codecs, "alac")))  codecs[i++] = register_ff("alc");
+ 	if (!strstr(exclude_codecs, "wma")  && (!include_codecs || strstr(include_codecs, "wma")))   codecs[i++] = register_ff("wma");
+ #endif
++#ifndef DISABLE_FAAD
+ 	if (!strstr(exclude_codecs, "aac")  && (!include_codecs || strstr(include_codecs, "aac")))  codecs[i++] = register_faad();
++#endif
+ 	if (!strstr(exclude_codecs, "ogg")  && (!include_codecs || strstr(include_codecs, "ogg")))  codecs[i++] = register_vorbis();
+ 	if (!strstr(exclude_codecs, "flac") && (!include_codecs || strstr(include_codecs, "flac"))) codecs[i++] = register_flac();
+ 	if (!strstr(exclude_codecs, "pcm")  && (!include_codecs || strstr(include_codecs, "pcm")))  codecs[i++] = register_pcm();
+diff -ruN squeezelite.orig/faad.c squeezelite/faad.c
+--- squeezelite.orig/faad.c	2014-07-29 10:54:01.888039245 +0300
++++ squeezelite/faad.c	2014-07-29 10:55:50.330878504 +0300
+@@ -20,6 +20,8 @@
+ 
+ #include "squeezelite.h"
+ 
++#ifndef DISABLE_FAAD
++
+ #include <neaacdec.h>
+ 
+ #define WRAPBUF_LEN 2048
+@@ -640,3 +642,5 @@
+ 	LOG_INFO("using faad to decode aac");
+ 	return &ret;
+ }
++
++#endif

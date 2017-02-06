@@ -1,0 +1,19 @@
+diff -ruN '--exclude=.git' squeezelite.orig/pcm.c squeezelite/pcm.c
+--- squeezelite.orig/pcm.c	2015-09-29 21:49:52.219246819 +0300
++++ squeezelite/pcm.c	2015-09-29 21:54:56.175215544 +0300
+@@ -166,8 +166,14 @@
+ 	u8_t tmp[16];
+ 	
+ 	LOCK_S;
++	
++	// mc2 - 05/09/2015
++	// When Wav or Aiff is streamed the header is preserved, so we
++	// could verify the real file forma. Usefull when resampling
++	// from server, in that case server parameters are wrong.
+ 
+-	if (decode.new_stream && stream.state == STREAMING_FILE) {
++	//if (decode.new_stream && stream.state == STREAMING_FILE) {
++	if (decode.new_stream) {
+ 		_check_header();
+ 	}
+ 

@@ -1,0 +1,18 @@
+--- squeezelite-1.8/pcm.c.orig	2016-02-27 15:49:49.152950400 +0000
++++ squeezelite-1.8/pcm.c	2016-02-28 07:26:04.638288967 +0000
+@@ -104,8 +104,13 @@
+ 				ptr += 8;
+ 				_buf_inc_readp(streambuf, ptr - streambuf->readp);
+ 				audio_left = len;
+-				LOG_INFO("audio size: %u", audio_left);
+-				limit = true;
++				if ((audio_left == 0xffffffff) || (audio_left == 0x7FFFEFFC)) {
++					LOG_INFO("audio size: unknown");
++					limit = false;
++				} else {
++					LOG_INFO("audio size: %u", audio_left);
++					limit = true;
++				}
+ 				return;
+ 			}
+ 

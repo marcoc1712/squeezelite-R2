@@ -2,6 +2,22 @@
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
+      <df name="Daphile patches">
+        <in>01-faad-optional.patch</in>
+        <in>02-check_header_on_wav+aiff_streaming.patch</in>
+        <in>03-multi-channel-pcm.patch</in>
+        <in>04-lms_downsampling_option+768kHz_maxrate-r2.patch</in>
+        <in>05-clean-compiler-warnings.patch</in>
+        <in>06-alsa_ctl_mixer_device.patch</in>
+        <in>07-native-dsd-support.patch</in>
+        <in>08-prefer-wav-over-aiff+pcm.patch</in>
+        <in>09-firmware-version.patch</in>
+        <in>10-24bit_dop_formats.patch</in>
+        <in>11-codec_priority.patch</in>
+        <in>12-unknown_wav_size.patch</in>
+        <in>13-remove_last_block_zero_padding.patch</in>
+        <in>14-disable_dop_wav_resampling.patch</in>
+      </df>
       <in>buffer.c</in>
       <in>decode.c</in>
       <in>faad.c</in>
@@ -55,6 +71,76 @@
           </ccTool>
         </makeTool>
       </makefileType>
+      <item path="Daphile patches/01-faad-optional.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/02-check_header_on_wav+aiff_streaming.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/03-multi-channel-pcm.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/04-lms_downsampling_option+768kHz_maxrate-r2.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/05-clean-compiler-warnings.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/06-alsa_ctl_mixer_device.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/07-native-dsd-support.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/08-prefer-wav-over-aiff+pcm.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/09-firmware-version.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/10-24bit_dop_formats.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/11-codec_priority.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/12-unknown_wav_size.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/13-remove_last_block_zero_padding.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="Daphile patches/14-disable_dop_wav_resampling.patch"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="buffer.c" ex="false" tool="0" flavor2="0">
         <cTool flags="0">
         </cTool>

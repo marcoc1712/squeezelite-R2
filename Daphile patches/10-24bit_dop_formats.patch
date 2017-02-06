@@ -1,0 +1,131 @@
+diff -ruN squeezelite-1.8.orig/dsd.c squeezelite-1.8/dsd.c
+--- squeezelite-1.8.orig/dsd.c	2015-11-24 08:36:08.401461318 +0000
++++ squeezelite-1.8/dsd.c	2015-11-24 08:57:16.690097060 +0000
+@@ -221,6 +221,8 @@
+ 	case DSD_U16_LE:
+ 	case DSD_U16_BE:
+ 	case DOP:
++	case DOP_S24_LE:
++	case DOP_S24_3LE:
+ 		bytes_per_frame = 2;
+ 		break;
+ 	default:
+@@ -398,6 +400,8 @@
+ 			break;
+ 
+ 		case DOP:
++		case DOP_S24_LE:
++		case DOP_S24_3LE:
+ 			
+ 			if (d->channels == 1) {
+ 				if (d->lsb_first) {
+@@ -528,6 +532,8 @@
+ 	case DSD_U16_LE:
+ 	case DSD_U16_BE:
+ 	case DOP:
++	case DOP_S24_LE:
++	case DOP_S24_3LE:
+ 		bytes_per_frame = d->channels * 2;
+ 		break;
+ 	default:
+@@ -624,6 +630,8 @@
+ 		break;
+ 		
+ 	case DOP:
++	case DOP_S24_LE:
++	case DOP_S24_3LE:
+ 		
+ 		if (d->channels == 1) {
+ 			while (count--) {
+@@ -762,6 +770,14 @@
+ 			fmtstr = "DOP";
+ 			output.next_sample_rate = d->sample_rate / 16;
+ 			break;
++		case DOP_S24_LE:
++			fmtstr = "DOP_S24_LE";
++			output.next_sample_rate = d->sample_rate / 16;
++			break;
++		case DOP_S24_3LE:
++			fmtstr = "DOP_S24_3LE";
++			output.next_sample_rate = d->sample_rate / 16;
++			break;
+ 		case PCM:
+ 			// PCM case after DSD rate check and possible fallback to PCM conversion 
+ 			break;
+diff -ruN squeezelite-1.8.orig/flac.c squeezelite-1.8/flac.c
+--- squeezelite-1.8.orig/flac.c	2015-11-24 08:36:08.404794534 +0000
++++ squeezelite-1.8/flac.c	2015-11-24 09:03:50.686215397 +0000
+@@ -125,7 +125,10 @@
+ #endif		
+ 		if (bits_per_sample == 24 && is_stream_dop(((u8_t *)lptr) + MARKER_OFFSET, ((u8_t *)rptr) + MARKER_OFFSET, 4, frames)) {
+ 			LOG_INFO("file contains DOP");
+-			output.next_fmt = DOP;
++			if (output.dsdfmt == DOP_S24_LE || output.dsdfmt == DOP_S24_3LE)
++				output.next_fmt = output.dsdfmt;
++			else
++				output.next_fmt = DOP;
+ 			output.next_sample_rate = frame->header.sample_rate;
+ 			output.fade = FADE_INACTIVE;
+ 		} else {
+diff -ruN squeezelite-1.8.orig/main.c squeezelite-1.8/main.c
+--- squeezelite-1.8.orig/main.c	2015-11-24 08:36:08.404794534 +0000
++++ squeezelite-1.8/main.c	2015-11-24 08:52:29.696877029 +0000
+@@ -465,6 +465,8 @@
+ 					if (!strcmp(fstr, "u32le")) dsd_outfmt = DSD_U32_LE; 
+ 					if (!strcmp(fstr, "u16be")) dsd_outfmt = DSD_U16_BE; 
+ 					if (!strcmp(fstr, "u32be")) dsd_outfmt = DSD_U32_BE;
++					if (!strcmp(fstr, "dop24")) dsd_outfmt = DOP_S24_LE;
++					if (!strcmp(fstr, "dop24_3")) dsd_outfmt = DOP_S24_3LE;
+ 				}
+ 			}
+ 			break;
+diff -ruN squeezelite-1.8.orig/output_alsa.c squeezelite-1.8/output_alsa.c
+--- squeezelite-1.8.orig/output_alsa.c	2015-11-24 08:36:08.404794534 +0000
++++ squeezelite-1.8/output_alsa.c	2015-11-24 09:12:04.125506491 +0000
+@@ -445,6 +445,10 @@
+ 		alsa.format = SND_PCM_FORMAT_DSD_U32_LE; break;
+ 	case DSD_U32_BE:
+ 		alsa.format = SND_PCM_FORMAT_DSD_U32_BE; break;
++	case DOP_S24_LE:
++		alsa.format = SND_PCM_FORMAT_S24_LE; break;
++	case DOP_S24_3LE:
++		alsa.format = SND_PCM_FORMAT_S24_3LE; break;
+ 	default:
+ 		alsa.format = alsa.pcmfmt;
+ 	}
+@@ -616,7 +620,7 @@
+ 			if (silence) {
+ 				inputptr = (s32_t *) silencebuf_dsd;
+ 			}
+-			if (output.outfmt == DOP)
++			if (output.outfmt == DOP || output.outfmt == DOP_S24_LE || output.outfmt == DOP_S24_3LE)
+ 				update_dop((u32_t *) inputptr, out_frames, output.invert && !silence);
+ 			else if (output.invert && !silence)
+ 				dsd_invert((u32_t *) inputptr, out_frames);
+diff -ruN squeezelite-1.8.orig/pcm.c squeezelite-1.8/pcm.c
+--- squeezelite-1.8.orig/pcm.c	2015-11-24 08:36:08.464792419 +0000
++++ squeezelite-1.8/pcm.c	2015-11-24 09:04:23.725051458 +0000
+@@ -206,7 +206,10 @@
+ 						  ((u8_t *)streambuf->readp) + (bigendian?0:2) + sample_size,
+ 						  sample_size * channels, bytes / (sample_size * channels))) {
+ 			LOG_INFO("file contains DOP");
+-			output.next_fmt = DOP;
++			if (output.dsdfmt == DOP_S24_LE || output.dsdfmt == DOP_S24_3LE)
++				output.next_fmt = output.dsdfmt;
++			else
++				output.next_fmt = DOP;
+ 			output.fade = FADE_INACTIVE;
+ 		} else {
+ 			output.next_fmt = PCM;
+diff -ruN squeezelite-1.8.orig/squeezelite.h squeezelite-1.8/squeezelite.h
+--- squeezelite-1.8.orig/squeezelite.h	2015-11-24 08:36:08.408127750 +0000
++++ squeezelite-1.8/squeezelite.h	2015-11-24 08:50:26.011234741 +0000
+@@ -518,7 +518,7 @@
+ 			   OUTPUT_PAUSE_FRAMES, OUTPUT_SKIP_FRAMES, OUTPUT_START_AT } output_state;
+ 
+ #if DSD
+-typedef enum { PCM, DOP, DSD_U8, DSD_U16_LE, DSD_U32_LE, DSD_U16_BE, DSD_U32_BE } dsd_format;
++typedef enum { PCM, DOP, DSD_U8, DSD_U16_LE, DSD_U32_LE, DSD_U16_BE, DSD_U32_BE, DOP_S24_LE, DOP_S24_3LE } dsd_format;
+ typedef enum { S32_LE, S24_LE, S24_3LE, S16_LE, U8, U16_LE, U16_BE, U32_LE, U32_BE } output_format;
+ #else
+ typedef enum { S32_LE, S24_LE, S24_3LE, S16_LE } output_format;

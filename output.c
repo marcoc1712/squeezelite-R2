@@ -32,7 +32,7 @@ struct buffer *outputbuf = &buf;
 
 u8_t *silencebuf;
 #if DSD
-u8_t *silencebuf_dop;
+u8_t *silencebuf_dsd;
 #endif
 
 #define LOCK   mutex_lock(outputbuf->mutex)
@@ -126,8 +126,8 @@ frames_t _output_frames(frames_t avail) {
 					delay = output.rate_delay;
 				}
 				IF_DSD(
-				   if (output.dop != output.next_dop) {
-					   delay = output.dop_delay;
+				   if (output.outfmt != output.next_fmt) {
+					   delay = output.dsd_delay;
 				   }
 				)
 				frames -= size;
@@ -149,7 +149,7 @@ frames_t _output_frames(frames_t avail) {
 				output.track_start_time = gettime_ms();
 				output.current_sample_rate = output.next_sample_rate;
 				IF_DSD(
-				   output.dop = output.next_dop;
+				   output.outfmt = output.next_fmt;
 				)
 				if (!output.fade == FADE_ACTIVE || !output.fade_mode == FADE_CROSSFADE) {
 					output.current_replay_gain = output.next_replay_gain;
@@ -163,7 +163,7 @@ frames_t _output_frames(frames_t avail) {
 		}
 
 		IF_DSD(
-			if (output.dop) {
+			if (output.outfmt != PCM) {
 				gainL = gainR = FIXED_ONE;
 			}
 		)
@@ -359,12 +359,12 @@ void output_init_common(log_level level, const char *device, unsigned output_buf
 	memset(silencebuf, 0, MAX_SILENCE_FRAMES * BYTES_PER_FRAME);
 
 	IF_DSD(
-		silencebuf_dop = malloc(MAX_SILENCE_FRAMES * BYTES_PER_FRAME);
-		if (!silencebuf_dop) {
-			LOG_ERROR("unable to malloc silence dop buffer");
+		silencebuf_dsd = malloc(MAX_SILENCE_FRAMES * BYTES_PER_FRAME);
+		if (!silencebuf_dsd) {
+			LOG_ERROR("unable to malloc silence dsd buffer");
 			exit(0);
 		}
-		dop_silence_frames((u32_t *)silencebuf_dop, MAX_SILENCE_FRAMES);
+		dsd_silence_frames((u32_t *)silencebuf_dsd, MAX_SILENCE_FRAMES);
 	)
 
 	LOG_DEBUG("idle timeout: %u", idle);
@@ -415,7 +415,7 @@ void output_close_common(void) {
 	buf_destroy(outputbuf);
 	free(silencebuf);
 	IF_DSD(
-		free(silencebuf_dop);
+		free(silencebuf_dsd);
 	)
 }
 

@@ -1,0 +1,156 @@
+diff -ruN squeezelite-1.8.orig/decode.c squeezelite-1.8/decode.c
+--- squeezelite-1.8.orig/decode.c	2015-10-07 06:28:19.297316324 +0000
++++ squeezelite-1.8/decode.c	2015-10-13 08:26:26.726467490 +0000
+@@ -52,7 +52,7 @@
+ #define MAY_PROCESS(x)
+ #endif
+ 
+-static void *decode_thread() {
++static void *decode_thread(void) {
+ 
+ 	while (running) {
+ 		size_t bytes, space, min_space;
+@@ -155,7 +155,7 @@
+ 	pthread_attr_t attr;
+ 	pthread_attr_init(&attr);
+ 	pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + DECODE_THREAD_STACK_SIZE);
+-	pthread_create(&thread, &attr, decode_thread, NULL);
++	pthread_create(&thread, &attr, (void * (*)(void *))decode_thread, NULL);
+ 	pthread_attr_destroy(&attr);
+ #endif
+ #if WIN
+diff -ruN squeezelite-1.8.orig/faad.c squeezelite-1.8/faad.c
+--- squeezelite-1.8.orig/faad.c	2015-10-07 06:28:19.300649541 +0000
++++ squeezelite-1.8/faad.c	2015-10-13 08:26:26.759799655 +0000
+@@ -583,7 +583,7 @@
+ 	}
+ }
+ 
+-static bool load_faad() {
++static bool load_faad(void) {
+ #if !LINKALL
+ 	void *handle = dlopen(LIBFAAD, RTLD_NOW);
+ 	char *err;
+diff -ruN squeezelite-1.8.orig/ffmpeg.c squeezelite-1.8/ffmpeg.c
+--- squeezelite-1.8.orig/ffmpeg.c	2015-10-07 06:28:19.300649541 +0000
++++ squeezelite-1.8/ffmpeg.c	2015-10-13 08:26:26.759799655 +0000
+@@ -119,7 +119,7 @@
+ 
+ 
+ // our own version of useful error function not included in earlier ffmpeg versions
+-static char *av__err2str(errnum) {
++static char *av__err2str(int errnum) {
+ 	static char buf[64];
+ 	AV(ff, strerror, errnum, buf, 64); 
+ 	return buf;
+@@ -575,7 +575,7 @@
+ 	}
+ }
+ 
+-static bool load_ff() {
++static bool load_ff(void) {
+ #if !LINKALL
+ 	void *handle_codec = NULL, *handle_format = NULL, *handle_util = NULL;
+ 	char name[30];
+diff -ruN squeezelite-1.8.orig/flac.c squeezelite-1.8/flac.c
+--- squeezelite-1.8.orig/flac.c	2015-10-07 06:28:19.300649541 +0000
++++ squeezelite-1.8/flac.c	2015-10-13 08:45:46.369150014 +0000
+@@ -231,7 +236,7 @@
+ 	}
+ }
+ 
+-static bool load_flac() {
++static bool load_flac(void) {
+ #if !LINKALL
+ 	void *handle = dlopen(LIBFLAC, RTLD_NOW);
+ 	char *err;
+diff -ruN squeezelite-1.8.orig/mad.c squeezelite-1.8/mad.c
+--- squeezelite-1.8.orig/mad.c	2015-10-07 06:28:19.300649541 +0000
++++ squeezelite-1.8/mad.c	2015-10-13 08:26:26.759799655 +0000
+@@ -355,7 +355,7 @@
+ 	m->readbuf = NULL;
+ }
+ 
+-static bool load_mad() {
++static bool load_mad(void) {
+ #if !LINKALL
+ 	void *handle = dlopen(LIBMAD, RTLD_NOW);
+ 	char *err;
+diff -ruN squeezelite-1.8.orig/mpg.c squeezelite-1.8/mpg.c
+--- squeezelite-1.8.orig/mpg.c	2015-10-07 06:28:19.300649541 +0000
++++ squeezelite-1.8/mpg.c	2015-10-13 08:26:26.759799655 +0000
+@@ -212,7 +212,7 @@
+ 	m->h = NULL;
+ }
+ 
+-static bool load_mpg() {
++static bool load_mpg(void) {
+ #if !LINKALL
+ 	void *handle = dlopen(LIBMPG, RTLD_NOW);
+ 	char *err;
+diff -ruN squeezelite-1.8.orig/output_stdout.c squeezelite-1.8/output_stdout.c
+--- squeezelite-1.8.orig/output_stdout.c	2015-10-07 06:28:19.300649541 +0000
++++ squeezelite-1.8/output_stdout.c	2015-10-13 08:26:26.763132872 +0000
+@@ -78,7 +81,7 @@
+ 	return (int)out_frames;
+ }
+ 
+-static void *output_thread() {
++static void *output_thread(void) {
+ 
+ 	LOCK;
+ 
+@@ -156,7 +159,7 @@
+ 	pthread_attr_t attr;
+ 	pthread_attr_init(&attr);
+ 	pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + OUTPUT_THREAD_STACK_SIZE);
+-	pthread_create(&thread, &attr, output_thread, NULL);
++	pthread_create(&thread, &attr, (void * (*)(void *))output_thread, NULL);
+ 	pthread_attr_destroy(&attr);
+ #endif
+ #if WIN
+diff -ruN squeezelite-1.8.orig/slimproto.c squeezelite-1.8/slimproto.c
+--- squeezelite-1.8.orig/slimproto.c	2015-10-07 06:28:19.303982757 +0000
++++ squeezelite-1.8/slimproto.c	2015-10-13 08:26:26.763132872 +0000
+@@ -501,7 +501,7 @@
+ 
+ static bool running;
+ 
+-static void slimproto_run() {
++static void slimproto_run(void) {
+ 	static u8_t buffer[MAXBUF];
+ 	int  expect = 0;
+ 	int  got    = 0;
+diff -ruN squeezelite-1.8.orig/stream.c squeezelite-1.8/stream.c
+--- squeezelite-1.8.orig/stream.c	2015-10-07 06:28:19.303982757 +0000
++++ squeezelite-1.8/stream.c	2015-10-13 08:26:26.763132872 +0000
+@@ -74,7 +74,7 @@
+ 	wake_controller();
+ }
+ 
+-static void *stream_thread() {
++static void *stream_thread(void) {
+ 
+ 	while (running) {
+ 
+@@ -310,7 +310,7 @@
+ 	pthread_attr_t attr;
+ 	pthread_attr_init(&attr);
+ 	pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + STREAM_THREAD_STACK_SIZE);
+-	pthread_create(&thread, &attr, stream_thread, NULL);
++	pthread_create(&thread, &attr, (void * (*)(void *))stream_thread, NULL);
+ 	pthread_attr_destroy(&attr);
+ #endif
+ #if WIN
+diff -ruN squeezelite-1.8.orig/vorbis.c squeezelite-1.8/vorbis.c
+--- squeezelite-1.8.orig/vorbis.c	2015-10-07 06:28:19.303982757 +0000
++++ squeezelite-1.8/vorbis.c	2015-10-13 08:26:26.763132872 +0000
+@@ -270,7 +270,7 @@
+ 	v->vf = NULL;
+ }
+ 
+-static bool load_vorbis() {
++static bool load_vorbis(void) {
+ #if !LINKALL
+ 	void *handle = dlopen(LIBVORBIS, RTLD_NOW);
+ 	char *err;
