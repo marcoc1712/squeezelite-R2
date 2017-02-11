@@ -1,0 +1,14 @@
+diff -ruN squeezelite-1.8.orig/output_alsa.c squeezelite-1.8/output_alsa.c
+--- squeezelite-1.8.orig/output_alsa.c	2016-03-30 05:15:28.789573579 +0000
++++ squeezelite-1.8/output_alsa.c	2016-03-30 05:20:01.680005567 +0000
+@@ -706,7 +706,9 @@
+ 		}
+ 
+ #if DSD
+-		if (!pcmp || alsa.rate != output.current_sample_rate || alsa.outfmt != output.outfmt ) {
++		if (!pcmp || alsa.rate != output.current_sample_rate ||
++			!( alsa.outfmt == output.outfmt || (alsa.outfmt == PCM && output.outfmt == DOP)
++			   || (alsa.outfmt == DOP && output.outfmt == PCM))) {
+ #else
+ 		if (!pcmp || alsa.rate != output.current_sample_rate) {
+ #endif

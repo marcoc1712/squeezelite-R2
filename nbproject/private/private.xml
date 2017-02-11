@@ -12,11 +12,6 @@
         <group>
             <file>file:/media/marco/Dati/Sviluppo/squeezelite-R2/pcm.c</file>
         </group>
-        <group name="Mymusic">
-            <file>file:/G:/Sviluppo/squeezelite-R2/squeezelite.h</file>
-            <file>file:/G:/Sviluppo/squeezelite-R2/output_pa.c</file>
-            <file>file:/G:/Sviluppo/squeezelite-R2/output_alsa.c</file>
-            <file>file:/G:/Sviluppo/squeezelite-R2/main.c</file>
-        </group>
+        <group name="Mymusic"/>
     </open-files>
 </project-private>

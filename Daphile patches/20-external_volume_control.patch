@@ -1,0 +1,143 @@
+diff -ruN squeezelite-1.8.orig/output_alsa.c squeezelite-1.8/output_alsa.c
+--- squeezelite-1.8.orig/output_alsa.c	2016-11-16 09:41:10.677750702 +0000
++++ squeezelite-1.8/output_alsa.c	2016-11-16 09:47:43.197357008 +0000
+@@ -182,7 +182,7 @@
+ 	long left, right, level, dB;
+ 	float lms_volume;
+ 	
+-	if (!alsa.volume_mixer_name) return;
++	if (!alsa.mixer_handle || !alsa.volume_mixer_name) return;
+ 	if (snd_mixer_handle_events(alsa.mixer_handle) < 1) return;
+ 
+ 	if ((err = snd_mixer_selem_get_playback_volume(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_LEFT, &left)) < 0) {
+@@ -306,6 +306,16 @@
+ 	snd_mixer_close(handle);
+ }
+ 
++void set_system_mixer(float volume) {
++	pid_t  pid;
++
++	char *cmd;
++	cmd = malloc(strlen(alsa.volume_mixer_name) + 100);
++	sprintf(cmd, "%s %.1f >& /dev/null", alsa.volume_mixer_name, volume);
++	if (system(cmd));
++	free(cmd);
++}
++
+ static void set_mixer(bool setmax, unsigned left, unsigned right) {
+ 	int err, dir;
+ 	long nleft, nright;
+@@ -313,6 +323,11 @@
+ 	float lvol = inv_lms_vol_curve(left);
+ 	float rvol = inv_lms_vol_curve(right);
+ 	
++	if (!strcmp(alsa.mixer_ctl, "system")) {
++		set_system_mixer(lvol > rvol ? lvol : rvol);
++		return;
++	}
++
+ 	if (alsa.mixer_linear) {
+         if (setmax) {
+             nleft = nright = alsa.mixer_max;
+@@ -972,33 +987,50 @@
+ 	return 0;
+ }
+ 
++void mixer_close_alsa(void) {
++	if (alsa.mixer_ctl) {
++		free(alsa.mixer_ctl);
++		alsa.mixer_ctl = NULL;
++	}
++	if (alsa.mixer_handle) {
++		snd_mixer_close(alsa.mixer_handle);
++		alsa.mixer_handle = NULL;
++	}
++}
++ 
+ int mixer_init_alsa(const char *device, char *volume_mixer, bool mixer_linear) {
+ 	int err;
+ 	snd_mixer_selem_id_t *sid;
+ 
++	alsa.mixer_linear = mixer_linear;
++	alsa.mixer_ctl = ctl4device(device);
++	if (!strcmp(alsa.mixer_ctl, "system")) {
++		alsa.volume_mixer_name = volume_mixer;
++		return 0;
++	}
++	
+ 	char *mixer = next_param(volume_mixer, ',');
+ 	char *index = next_param(NULL, ',');
+ 	int mixer_index = index ? atoi(index) : 0;
+ 	
+-	alsa.mixer_linear = mixer_linear;
+-	
+ 	if ((err = snd_mixer_open(&alsa.mixer_handle, 0)) < 0) {
+ 		LOG_ERROR("open error: %s", snd_strerror(err));
++		alsa.mixer_handle = NULL;
+ 		return -1;
+ 	}
+ 	if ((err = snd_mixer_attach(alsa.mixer_handle, device)) < 0) {
+ 		LOG_ERROR("attach error: %s", snd_strerror(err));
+-		snd_mixer_close(alsa.mixer_handle);
++		mixer_close_alsa();
+ 		return -1;
+ 	}
+ 	if ((err = snd_mixer_selem_register(alsa.mixer_handle, NULL, NULL)) < 0) {
+ 		LOG_ERROR("register error: %s", snd_strerror(err));
+-		snd_mixer_close(alsa.mixer_handle);
++		mixer_close_alsa();
+ 		return -1;
+ 	}
+ 	if ((err = snd_mixer_load(alsa.mixer_handle)) < 0) {
+ 		LOG_ERROR("load error: %s", snd_strerror(err));
+-		snd_mixer_close(alsa.mixer_handle);
++		mixer_close_alsa();
+ 		return -1;
+ 	}
+ 
+@@ -1008,7 +1040,7 @@
+ 
+ 	if ((alsa.mixer_elem = snd_mixer_find_selem(alsa.mixer_handle, sid)) == NULL) {
+ 		LOG_ERROR("error find selem %s", alsa.mixer_handle);
+-		snd_mixer_close(alsa.mixer_handle);
++		mixer_close_alsa();
+ 		return -1;
+ 	}
+ 
+@@ -1024,6 +1056,7 @@
+ 		if ((err = snd_mixer_selem_get_playback_volume_range(alsa.mixer_elem, &alsa.mixer_min, &alsa.mixer_max)) < 0)
+ 		{
+ 			LOG_ERROR("Unable to get volume raw range");
++			mixer_close_alsa();
+ 			return -1;
+ 		}
+ 	}
+@@ -1071,7 +1104,6 @@
+ 	alsa.reopen = ((alsa_flags & 1) != 0);
+ 	alsa.mixer_handle = NULL;
+ 	alsa.ctl = ctl4device(device);
+-	alsa.mixer_ctl = mixer_device ? ctl4device(mixer_device) : alsa.ctl;
+ 	alsa.volume_mixer_name = NULL;
+ 
+ 	output.format = 0;
+@@ -1103,9 +1135,8 @@
+ 	output_init_common(level, device, output_buf_size, rates, idle);
+ 	
+ 	if (volume_mixer) {
+-		if (mixer_init_alsa(alsa.mixer_ctl, volume_mixer, mixer_linear) < 0) {
++		if (mixer_init_alsa(mixer_device ? mixer_device : device, volume_mixer, mixer_linear) < 0) {
+ 			LOG_ERROR("Initialization of mixer failed, reverting to software volume");
+-			alsa.mixer_handle = NULL;
+ 		}
+ 	}
+ 	if (mixer_unmute && alsa.volume_mixer_name) {
+@@ -1157,8 +1188,7 @@
+ 
+ 	if (alsa.write_buf) free(alsa.write_buf);
+ 	if (alsa.ctl) free(alsa.ctl);
+-	if (alsa.mixer_ctl) free(alsa.mixer_ctl);
+-	if (alsa.mixer_handle != NULL) snd_mixer_close(alsa.mixer_handle);
++	mixer_close_alsa();
+ 
+ 	output_close_common();
+ }

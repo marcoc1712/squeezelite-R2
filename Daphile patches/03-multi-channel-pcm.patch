@@ -63,4 +63,4 @@
 +		}
  	}
  
- 	LOG_SDEBUG("decoded %u frames", frames
+ 	LOG_SDEBUG("decoded %u frames", frames);

@@ -1,0 +1,55 @@
+--- squeezelite-1.8/output_alsa.c.orig	2016-04-06 06:11:02.197930841 +0000
++++ squeezelite-1.8/output_alsa.c	2016-04-06 06:20:33.314685948 +0000
+@@ -48,6 +48,7 @@
+ #if DSD
+ 	dsd_format outfmt;
+ 	snd_pcm_format_t pcmfmt;
++	bool nat_dsd_mode_xhack;
+ #endif
+ 	snd_pcm_uframes_t buffer_size;
+ 	snd_pcm_uframes_t period_size;
+@@ -715,6 +716,13 @@
+ 			LOG_INFO("open output device: %s", output.device);
+ 			LOCK;
+ 
++#if DSD
++			// Some DACs (at least Matrix X-Sabre) fail on transitions between PCM 88.2kHz and native mode DSD64 tracks. 
++			// The following hack makes intermidiate device openning to PCM 44.1kHz between such transitions.
++			if (alsa.nat_dsd_mode_xhack && pcmp && alsa.rate == output.current_sample_rate)
++				alsa_open(output.device, 44100, output.buffer, output.period, PCM);
++#endif
++				
+ 			// FIXME - some alsa hardware requires opening twice for a new sample rate to work
+ 			// this is a workaround which should be removed
+ 			if (alsa.reopen) {
+@@ -879,7 +887,7 @@
+ 	unsigned alsa_period = ALSA_PERIOD_COUNT;
+ 	char *alsa_sample_fmt = NULL;
+ 	bool alsa_mmap = true;
+-	bool alsa_reopen = false;
++	unsigned alsa_flags = 0;
+ 
+ 	char *volume_mixer_name = next_param(volume_mixer, ',');
+ 	char *volume_mixer_index = next_param(NULL, ',');
+@@ -894,7 +902,7 @@
+ 	if (c) alsa_period = atoi(c);
+ 	if (s) alsa_sample_fmt = s;
+ 	if (m) alsa_mmap = atoi(m);
+-	if (r) alsa_reopen = atoi(r);
++	if (r) alsa_flags = atoi(r);
+ 
+ 	loglevel = level;
+ 
+@@ -906,10 +914,11 @@
+ 	alsa.write_buf = NULL;
+ #if DSD
+ 	alsa.pcmfmt = 0;
++	alsa.nat_dsd_mode_xhack = ((alsa_flags & 2) != 0);
+ #else
+ 	alsa.format = 0;
+ #endif
+-	alsa.reopen = alsa_reopen;
++	alsa.reopen = ((alsa_flags & 1) != 0);
+ 	alsa.ctl = ctl4device(device);
+ 
+ 	if (!mixer_unmute) {

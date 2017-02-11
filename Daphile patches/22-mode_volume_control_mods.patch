@@ -1,0 +1,339 @@
+diff -ruN squeezelite-1.8.orig/output_alsa.c squeezelite-1.8/output_alsa.c
+--- squeezelite-1.8.orig/output_alsa.c	2016-11-29 05:53:43.374928172 +0000
++++ squeezelite-1.8/output_alsa.c	2016-11-29 05:54:18.530366053 +0000
+@@ -63,9 +63,9 @@
+ 	snd_mixer_t *mixer_handle;
+ 	long mixer_min;
+ 	long mixer_max;
++	float mixer_range;
++	float lms_volume;
+ 	long mixer_set_raw;
+-	long mixer_set_ldB;
+-	long mixer_set_rdB;
+ } alsa;
+ 
+ static snd_pcm_t *pcmp = NULL;
+@@ -123,64 +123,24 @@
+ 	return vol;
+ }
+ 
+-static float inv_daphile_vol_curve(float y2) {
+-	float totalVolumeRange = -74.0;
+-	float stepPoint = 24;
+-	float stepdB = -38;
+-	float maxVolumedB = 0.0;
+-	float slope_high = (maxVolumedB - stepdB) / (100 - stepPoint); // 0.5
+-	float slope_low = (stepdB - totalVolumeRange) / stepPoint;     // 1.5
+-	float m, x1, y1, x2;
+-
+-	if (y2 > stepdB) {
+-		m = slope_high;
+-		x1 = 100.0;
+-		y1 = maxVolumedB;
+-	} else {
+-		m = slope_low;
+-		x1 = 0.0;
+-		y1 = totalVolumeRange;
+-	}
+-	
+-	x2 = x1 + (y2 - y1) / m;
+-
+-	if (x2 > 100.0) x2 = 100.0;
+-	if (x2 < 0.0) x2 = 0.0;
+-
+-	return x2;
++static float inv_daphile_vol_curve(float db, float range) {
++	float min = pow(10.0, -range / 60.0);
++	if (db > 0.0) db = 0.0;
++	if (db < -range) db = -range;
++	return 100.0 * ( pow(10.0, db / 60.0) - min ) / ( 1.0 - min );
+ }
+ 
+-static float daphile_vol_curve(float x2) {
+-	float totalVolumeRange = -74.0;
+-	float stepPoint = 24;
+-	float stepdB = -38;
+-	float maxVolumedB = 0.0;
+-	float slope_high = (maxVolumedB - stepdB) / (100 - stepPoint); // 0.5
+-	float slope_low = (stepdB - totalVolumeRange) / stepPoint;     // 1.5
+-	float m, x1, y1, y2;
+-
+-	if (x2 > 100.0) x2 = 100.0;
+-	if (x2 < 0.0) x2 = 0.0;
+-
+-	if (x2 > stepPoint) {
+-		m = slope_high;
+-		x1 = 100.0;
+-		y1 = maxVolumedB;
+-	} else {
+-		m = slope_low;
+-		x1 = 0.0;
+-		y1 = totalVolumeRange;
+-	}
+-	
+-	y2 = y1 + m * (x2 - x1);
+-
+-	return y2;
++static float daphile_vol_curve(float volume, float range) {
++	float min = pow(10.0, -range / 60.0);
++	if (volume < 0.0) volume = 0.0;
++	if (volume > 100.0) volume = 100.0;
++	return 60.0 * log10(volume * (1.0 - min) / 100.0 + min);
+ }
+ 
+ void send_volume(void) {
+ 	int err;
+-	long left, right, level, dB;
+-	float lms_volume;
++	long left, right, level;
++	float lms_volume, scale;
+ 	
+ 	if (!alsa.mixer_handle || !alsa.volume_mixer_name) return;
+ 	if (snd_mixer_handle_events(alsa.mixer_handle) < 1) return;
+@@ -196,23 +156,23 @@
+ 
+ 	level = (left > right ? left : right);
+ 	if (level == alsa.mixer_set_raw) return;
++	
++	scale = (float)( level - alsa.mixer_min ) / ( alsa.mixer_max - alsa.mixer_min );
+ 
+ 	if (alsa.mixer_linear) {
+-		lms_volume = 100.0 * ( level - alsa.mixer_min ) / ( alsa.mixer_max - alsa.mixer_min );
++		lms_volume = 100.0 * scale;
+ 	} else {
+-		if ((err = snd_mixer_selem_get_playback_dB(alsa.mixer_elem, (left > right ? SND_MIXER_SCHN_FRONT_LEFT : SND_MIXER_SCHN_FRONT_RIGHT), &dB)) < 0) {
+-			LOG_ERROR("error getting vol in dB: %s", snd_strerror(err));
+-			return;
+-		}
+-		lms_volume = inv_daphile_vol_curve(0.01 * ( dB - alsa.mixer_max ));
++		lms_volume = inv_daphile_vol_curve( alsa.mixer_range * ( scale - 1 ), alsa.mixer_range);
+ 	}
+ 
++	lms_volume = floor( lms_volume + 0.5 );
+ 	char volcmd[32];
+-	lms_volume = floor(lms_volume * 100 + 0.5) / 100;
+ 	sprintf(volcmd, "\"mixer\",\"volume\",\"%.1f\"", lms_volume);
+ 	send_jsonrpc(volcmd);
+-	LOG_INFO("sync changed volume from mixer to LMS: %.1f", lms_volume);
++
++	LOG_DEBUG("mixer vol changed (raw: %ld), sync LMS vol to %.1f", level, lms_volume);
+ 	alsa.mixer_set_raw = level;
++	alsa.lms_volume = lms_volume;
+ }
+ 
+ static char *ctl4device(const char *device) {
+@@ -306,96 +266,69 @@
+ 	snd_mixer_close(handle);
+ }
+ 
+-void set_system_mixer(float volume) {
+-	pid_t  pid;
+-
++bool set_system_mixer(float volume) {
++	bool success = true;
+ 	char *cmd;
+ 	cmd = malloc(strlen(alsa.volume_mixer_name) + 100);
+ 	sprintf(cmd, "%s %.1f >& /dev/null", alsa.volume_mixer_name, volume);
+-	if (system(cmd));
++	if (system(cmd)) success = false;
+ 	free(cmd);
++	LOG_DEBUG("execute: %s %.1f", alsa.volume_mixer_name, volume);
++	return success;
+ }
+ 
+-static void set_mixer(bool setmax, unsigned left, unsigned right) {
+-	int err, dir;
+-	long nleft, nright;
++static void set_mixer(float volume) {
++	int err;
++	float scale;
++	long raw;
++
++	if (volume == alsa.lms_volume) return;
+ 
+-	float lvol = inv_lms_vol_curve(left);
+-	float rvol = inv_lms_vol_curve(right);
+-	
+ 	if (!strcmp(alsa.mixer_ctl, "system")) {
+-		set_system_mixer(lvol > rvol ? lvol : rvol);
++		if (set_system_mixer(volume)) alsa.lms_volume = volume;
+ 		return;
+ 	}
+ 
++	alsa.lms_volume = volume;
+ 	if (alsa.mixer_linear) {
+-        if (setmax) {
+-            nleft = nright = alsa.mixer_max;
+-        } else {
+-            nleft = floor(lvol * (alsa.mixer_max - alsa.mixer_min) / 100.0 + 0.5) + alsa.mixer_min;
+-            nright = floor(rvol * (alsa.mixer_max - alsa.mixer_min) / 100.0 + 0.5) + alsa.mixer_min;
+-        }
+-        LOG_DEBUG("setting vol raw [%ld..%ld]", alsa.mixer_min, alsa.mixer_max);
+-        if ((err = snd_mixer_selem_set_playback_volume(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_LEFT, nleft)) < 0) {
+-            LOG_ERROR("error setting left volume: %s", snd_strerror(err));
+-        }
+-        if ((err = snd_mixer_selem_set_playback_volume(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_RIGHT, nright)) < 0) {
+-            LOG_ERROR("error setting right volume: %s", snd_strerror(err));
+-        }
++		scale = volume / 100.0;
+ 	} else {
+-		// set db directly
+-		LOG_DEBUG("setting vol dB [%ld..%ld]", alsa.mixer_min, alsa.mixer_max);
+-		if (setmax) {
+-			nleft = nright = alsa.mixer_max;
+-		} else {
+-			nleft = 50 * floor(2 * daphile_vol_curve(lvol) + 0.5) + alsa.mixer_max;
+-			nright = 50 * floor(2 * daphile_vol_curve(rvol) + 0.5) + alsa.mixer_max;
+-		}
+-		
+-		dir = (nleft > alsa.mixer_set_ldB ? 1 : -1);
+-		if ((err = snd_mixer_selem_set_playback_dB(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_LEFT, nleft, dir)) < 0) {
+-			LOG_ERROR("error setting left volume: %s", snd_strerror(err));
+-		} else {
+-			alsa.mixer_set_ldB = nleft;
+-		}
+-		
+-		dir = (nright > alsa.mixer_set_rdB ? 1 : -1);
+-		if ((err = snd_mixer_selem_set_playback_dB(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_RIGHT, nright, dir)) < 0) {
+-			LOG_ERROR("error setting right volume: %s", snd_strerror(err));
+-		} else {
+-			alsa.mixer_set_rdB = nright;
+-		}
++		scale = 1.0 + daphile_vol_curve(volume, alsa.mixer_range) / alsa.mixer_range;
+ 	}
+ 
+-	if ((err = snd_mixer_selem_get_playback_volume(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_LEFT, &nleft)) < 0) {
+-		LOG_ERROR("error getting left vol: %s", snd_strerror(err));
+-	} else {
+-		alsa.mixer_set_raw = nleft;
++	raw = floor(scale * (alsa.mixer_max - alsa.mixer_min) + 0.5) + alsa.mixer_min;
++	if (raw == alsa.mixer_set_raw) {
++		LOG_DEBUG("LMS vol: %.1f, no change in mixer vol raw [%ld..%ld]: %ld", volume, alsa.mixer_min, alsa.mixer_max, raw);
++		return;
+ 	}
+-	if ((err = snd_mixer_selem_get_playback_volume(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_RIGHT, &nright)) < 0) {
+-		LOG_ERROR("error getting right vol: %s", snd_strerror(err));
+-	} else if (nright > nleft) {
+-		alsa.mixer_set_raw = nright;
++	LOG_DEBUG("LMS vol: %.1f, set mixer vol raw [%ld..%ld]: %ld", volume, alsa.mixer_min, alsa.mixer_max, raw);
++	if ((err = snd_mixer_selem_set_playback_volume(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_LEFT, raw)) < 0) {
++		LOG_ERROR("error setting left volume: %s", snd_strerror(err));
+ 	}
+-
+-	LOG_DEBUG("%s left: %3.1fdB -> %ld right: %3.1fdB -> %ld", alsa.volume_mixer_name,
+-			  alsa.mixer_set_ldB / 100.0, nleft, alsa.mixer_set_rdB / 100.0, nright);
++	if ((err = snd_mixer_selem_set_playback_volume(alsa.mixer_elem, SND_MIXER_SCHN_FRONT_RIGHT, raw)) < 0) {
++		LOG_ERROR("error setting right volume: %s", snd_strerror(err));
++	}
++	alsa.mixer_set_raw = raw;
+ }
+ 
+ void set_volume(unsigned left, unsigned right) {
+-
++	
++	float lvol = inv_lms_vol_curve(left);
++	float rvol = inv_lms_vol_curve(right);
++	float volume = ( lvol < rvol ? lvol : rvol );
++	volume = floor(volume + 0.5);
++	
+ 	if (!alsa.volume_mixer_name) {
+ 		LOG_DEBUG("setting internal gain left: %u right: %u", left, right);
+ 		LOCK;
+-		output.gainL = left;
+-		output.gainR = right;
++		output.gainL = output.gainR = floor( 65536.0 * pow(10.0, daphile_vol_curve(volume, 74.0) / 20) + 0.5 );
+ 		UNLOCK;
+ 	} else {
+ 		LOCK;
+ 		output.gainL = FIXED_ONE;
+ 		output.gainR = FIXED_ONE;
+ 		UNLOCK;
+-		set_mixer(false, left, right);
++		set_mixer(volume);
+ 	}
+ }
+ 
+@@ -998,10 +931,11 @@
+ 	}
+ }
+  
+-int mixer_init_alsa(const char *device, char *volume_mixer, bool mixer_linear) {
++int mixer_init_alsa(log_level level, const char *device, char *volume_mixer, bool mixer_linear) {
+ 	int err;
+ 	snd_mixer_selem_id_t *sid;
+ 
++	loglevel = level;
+ 	alsa.mixer_linear = mixer_linear;
+ 	alsa.mixer_ctl = ctl4device(device);
+ 	if (!strcmp(alsa.mixer_ctl, "system")) {
+@@ -1048,19 +982,23 @@
+ 		snd_mixer_selem_set_playback_switch_all(alsa.mixer_elem, 1); // unmute
+ 	}
+ 
+-	err = snd_mixer_selem_get_playback_dB_range(alsa.mixer_elem, &alsa.mixer_min, &alsa.mixer_max);
++	long mixer_min, mixer_max;
++	err = snd_mixer_selem_get_playback_dB_range(alsa.mixer_elem, &mixer_min, &mixer_max);
+ 
+-	if (err < 0 || alsa.mixer_max - alsa.mixer_min < 1000 || alsa.mixer_linear) {
++	if (err < 0 || mixer_max - mixer_min < 1000 || alsa.mixer_linear) {
+ 	    alsa.mixer_linear = 1;
+-		// unable to get db range or range is less than 10dB - ignore and set using raw values
+-		if ((err = snd_mixer_selem_get_playback_volume_range(alsa.mixer_elem, &alsa.mixer_min, &alsa.mixer_max)) < 0)
+-		{
+-			LOG_ERROR("Unable to get volume raw range");
+-			mixer_close_alsa();
+-			return -1;
+-		}
++	} else {
++		alsa.mixer_range = (mixer_max - mixer_min) / 100.0;
++	}
++	
++	if ((err = snd_mixer_selem_get_playback_volume_range(alsa.mixer_elem, &alsa.mixer_min, &alsa.mixer_max)) < 0) {
++		LOG_ERROR("Unable to get volume raw range");
++		mixer_close_alsa();
++		return -1;
+ 	}
+ 	alsa.volume_mixer_name = mixer;
++	alsa.mixer_set_raw = -1;
++	alsa.lms_volume = -1.0;
+ 	LOG_ERROR("ALSA mixer initialized: %s (%s)", volume_mixer, device);
+     return 0;
+ }
+@@ -1135,12 +1073,12 @@
+ 	output_init_common(level, device, output_buf_size, rates, idle);
+ 	
+ 	if (volume_mixer) {
+-		if (mixer_init_alsa(mixer_device ? mixer_device : device, volume_mixer, mixer_linear) < 0) {
++		if (mixer_init_alsa(level, mixer_device ? mixer_device : device, volume_mixer, mixer_linear) < 0) {
+ 			LOG_ERROR("Initialization of mixer failed, reverting to software volume");
+ 		}
+ 	}
+ 	if (mixer_unmute && alsa.volume_mixer_name) {
+-		set_mixer(true, 0, 0);
++		set_mixer(100.0);
+ 		alsa.volume_mixer_name = NULL;
+ 	}
+ 
+diff -ruN squeezelite-1.8.orig/output_stdout.c squeezelite-1.8/output_stdout.c
+--- squeezelite-1.8.orig/output_stdout.c	2016-11-29 05:53:43.374928172 +0000
++++ squeezelite-1.8/output_stdout.c	2016-11-29 05:53:30.388715401 +0000
+@@ -129,7 +129,7 @@
+ 	LOG_INFO("init output stdout");
+ 
+ 	if (mixer_device && volume_mixer) {
+-		if (mixer_init_alsa(mixer_device, volume_mixer, mixer_linear) < 0) {
++		if (mixer_init_alsa(level, mixer_device, volume_mixer, mixer_linear) < 0) {
+ 			LOG_ERROR("Initialization of mixer failed, reverting to software volume");
+ 		}
+ 	}
+diff -ruN squeezelite-1.8.orig/squeezelite.h squeezelite-1.8/squeezelite.h
+--- squeezelite-1.8.orig/squeezelite.h	2016-11-29 05:53:43.374928172 +0000
++++ squeezelite-1.8/squeezelite.h	2016-11-29 05:53:30.388715401 +0000
+@@ -603,6 +603,7 @@
+ void send_volume(void);
+ bool test_open(const char *device, unsigned rates[]);
+ void output_init_alsa(log_level level, const char *device, unsigned output_buf_size, char *params, unsigned rates[], unsigned rate_delay, unsigned rt_priority, unsigned idle, char *mixer_device, char *volume_mixer, bool mixer_unmute, bool mixer_linear);
++int mixer_init_alsa(log_level level, const char *device, char *volume_mixer, bool mixer_linear);
+ void output_close_alsa(void);
+ #endif
+ 

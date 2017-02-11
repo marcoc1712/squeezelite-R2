@@ -1,0 +1,126 @@
+diff -ruN squeezelite-1.8.orig/main.c squeezelite-1.8/main.c
+--- squeezelite-1.8.orig/main.c	2016-10-31 16:01:15.037682251 +0000
++++ squeezelite-1.8/main.c	2016-10-31 17:38:22.244498915 +0000
+@@ -295,10 +295,11 @@
+ 
+ 		switch (opt[0]) {
+ 		case 'o':
+-			output_device = optarg;
+ #if ALSA
+-			mixer_device = optarg;
++			if (mixer_device == output_device)
++				mixer_device = optarg;
+ #endif
++			output_device = optarg;
+ 			break;
+ 		case 'a':
+ 			output_params = optarg;
+@@ -592,7 +593,7 @@
+ 	stream_init(log_stream, stream_buf_size);
+ 
+ 	if (!strcmp(output_device, "-")) {
+-		output_init_stdout(log_output, output_buf_size, output_params, rates, rate_delay);
++		output_init_stdout(log_output, output_buf_size, output_params, rates, rate_delay, mixer_device, output_mixer, linear_volume);
+ 	} else {
+ #if ALSA
+ 		output_init_alsa(log_output, output_device, output_buf_size, output_params, rates, rate_delay, rt_priority, idle, mixer_device, output_mixer,
+diff -ruN squeezelite-1.8.orig/output_alsa.c squeezelite-1.8/output_alsa.c
+--- squeezelite-1.8.orig/output_alsa.c	2016-10-31 16:01:15.114346246 +0000
++++ squeezelite-1.8/output_alsa.c	2016-10-31 17:40:52.932579548 +0000
+@@ -972,10 +972,16 @@
+ 	return 0;
+ }
+ 
+-int mixer_init_alsa(const char *device, const char *mixer, int mixer_index) {
++int mixer_init_alsa(const char *device, char *volume_mixer, bool mixer_linear) {
+ 	int err;
+ 	snd_mixer_selem_id_t *sid;
+ 
++	char *mixer = next_param(volume_mixer, ',');
++	char *index = next_param(NULL, ',');
++	int mixer_index = index ? atoi(index) : 0;
++	
++	alsa.mixer_linear = mixer_linear;
++	
+ 	if ((err = snd_mixer_open(&alsa.mixer_handle, 0)) < 0) {
+ 		LOG_ERROR("open error: %s", snd_strerror(err));
+ 		return -1;
+@@ -1021,6 +1027,8 @@
+ 			return -1;
+ 		}
+ 	}
++	alsa.volume_mixer_name = mixer;
++	LOG_ERROR("ALSA mixer initialized: %s (%s)", volume_mixer, device);
+     return 0;
+ }
+ 
+@@ -1034,9 +1042,6 @@
+ 	bool alsa_mmap = true;
+ 	unsigned alsa_flags = 0;
+ 
+-	char *volume_mixer_name = next_param(volume_mixer, ',');
+-	char *volume_mixer_index = next_param(NULL, ',');
+-
+ 	char *t = next_param(params, ':');
+ 	char *c = next_param(NULL, ':');
+ 	char *s = next_param(NULL, ':');
+@@ -1067,8 +1072,7 @@
+ 	alsa.mixer_handle = NULL;
+ 	alsa.ctl = ctl4device(device);
+ 	alsa.mixer_ctl = mixer_device ? ctl4device(mixer_device) : alsa.ctl;
+-	alsa.volume_mixer_name = volume_mixer_name;
+-	alsa.mixer_linear = mixer_linear;
++	alsa.volume_mixer_name = NULL;
+ 
+ 	output.format = 0;
+ 	output.buffer = alsa_buffer;
+@@ -1098,13 +1102,10 @@
+ 
+ 	output_init_common(level, device, output_buf_size, rates, idle);
+ 	
+-	if (volume_mixer_name) {
+-	        if (mixer_init_alsa(alsa.mixer_ctl, alsa.volume_mixer_name, volume_mixer_index ?
+-			atoi(volume_mixer_index) : 0) < 0)
+-		{
++	if (volume_mixer) {
++		if (mixer_init_alsa(alsa.mixer_ctl, volume_mixer, mixer_linear) < 0) {
+ 			LOG_ERROR("Initialization of mixer failed, reverting to software volume");
+ 			alsa.mixer_handle = NULL;
+-			alsa.volume_mixer_name = NULL;
+ 		}
+ 	}
+ 	if (mixer_unmute && alsa.volume_mixer_name) {
+diff -ruN squeezelite-1.8.orig/output_stdout.c squeezelite-1.8/output_stdout.c
+--- squeezelite-1.8.orig/output_stdout.c	2016-10-31 16:01:14.277708740 +0000
++++ squeezelite-1.8/output_stdout.c	2016-10-31 17:09:21.495072224 +0000
+@@ -123,11 +123,17 @@
+ 
+ static thread_type thread;
+ 
+-void output_init_stdout(log_level level, unsigned output_buf_size, char *params, unsigned rates[], unsigned rate_delay) {
++void output_init_stdout(log_level level, unsigned output_buf_size, char *params, unsigned rates[], unsigned rate_delay, char *mixer_device, char *volume_mixer, bool mixer_linear) {
+ 	loglevel = level;
+ 
+ 	LOG_INFO("init output stdout");
+ 
++	if (mixer_device && volume_mixer) {
++		if (mixer_init_alsa(mixer_device, volume_mixer, mixer_linear) < 0) {
++			LOG_ERROR("Initialization of mixer failed, reverting to software volume");
++		}
++	}
++
+ 	buf = malloc(FRAME_BLOCK * BYTES_PER_FRAME);
+ 	if (!buf) {
+ 		LOG_ERROR("unable to malloc buf");
+diff -ruN squeezelite-1.8.orig/squeezelite.h squeezelite-1.8/squeezelite.h
+--- squeezelite-1.8.orig/squeezelite.h	2016-10-31 16:01:15.117679463 +0000
++++ squeezelite-1.8/squeezelite.h	2016-10-31 17:07:52.931481641 +0000
+@@ -617,7 +617,7 @@
+ #endif
+ 
+ // output_stdout.c
+-void output_init_stdout(log_level level, unsigned output_buf_size, char *params, unsigned rates[], unsigned rate_delay);
++void output_init_stdout(log_level level, unsigned output_buf_size, char *params, unsigned rates[], unsigned rate_delay, char *mixer_device, char *volume_mixer, bool mixer_linear);
+ void output_close_stdout(void);
+ 
+ // output_pack.c
