@@ -152,4 +152,9 @@ Version 1.8.2 (R2) 21/12/15
 No new Features.
 - Replaced option -h with -x according to the pach released by Daphile.
 - Minor changes in makefiles.
- 
+
+Version 1.8.3 (R2) 21/12/15
+===========================
+
+No new Features.
+-- prevent premature EOF in sox's upsampled pcm streams.
