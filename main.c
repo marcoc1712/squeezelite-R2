@@ -47,6 +47,7 @@ static void usage(const char *argv0) {
 		   "  -s <server>[:<port>]\tConnect to specified server, otherwise uses autodiscovery to find server\n"
 		   "  -o <output device>\tSpecify output device, default \"default\", - = output to stdout\n"
 		   "  -l \t\t\tList output devices\n"
+		   "  -x \t\t\tDisable downsampling requests to LMS\n"
 #if ALSA
 		   "  -a <b>:<p>:<f>:<m>\tSpecify ALSA params to open output device, b = buffer time in ms or size in bytes, p = period count or size in bytes, f sample format (16|24|24_3|32), m = use mmap (0|1)\n"
 #endif
@@ -83,7 +84,6 @@ static void usage(const char *argv0) {
 #endif
 		   "  -r <rates>[:<delay>]\tSample rates supported, allows output to be off when squeezelite is started; rates = <maxrate>|<minrate>-<maxrate>|<rate1>,<rate2>,<rate3>; delay = optional delay switching rates in ms\n"
 #if RESAMPLE
-		   "  -x \t\t\tDisable LMS side downsampling\n"
 		   "  -R -u [params]\tResample, params = <recipe>:<flags>:<attenuation>:<precision>:<passband_end>:<stopband_start>:<phase_response>,\n" 
 		   "  \t\t\t recipe = (v|h|m|l|q)(L|I|M)(s) [E|X], E = exception - resample only if native rate not supported, X = async - resample to max rate for device, otherwise to max sync rate\n"
 		   "  \t\t\t flags = num in hex,\n"
@@ -259,7 +259,7 @@ int main(int argc, char **argv) {
 
 	while (optind < argc && strlen(argv[optind]) >= 2 && argv[optind][0] == '-') {
 		char *opt = argv[optind] + 1;
-		if (strstr("oabcCdefmMnNpPrs"
+		if (strstr("oabcCdefmMnNpPrsx"
 #if ALSA
 				   "UV"
 #endif
@@ -271,7 +271,7 @@ int main(int argc, char **argv) {
 						  "L"
 #endif
 #if RESAMPLE
-						  "uxR"
+						  "uR"
 #endif
 #if DSD
 						  "D"
@@ -416,6 +416,9 @@ int main(int argc, char **argv) {
 		case 'N':
 			namefile = optarg;
 			break;
+		case 'x':
+			lms_downsample = false;
+			break;
 #if ALSA
 		case 'p':
 			rt_priority = atoi(optarg);
@@ -442,9 +445,6 @@ int main(int argc, char **argv) {
 			break;
 #endif
 #if RESAMPLE
-		case 'x':
-			lms_downsample = false;
-			break;
 		case 'u':
 		case 'R':
 			if (optind < argc && argv[optind] && argv[optind][0] != '-') {

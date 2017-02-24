@@ -687,13 +687,21 @@ static void *output_thread(void *arg) {
 		}
 
 #if DSD
-		if (!pcmp || alsa.rate != output.current_sample_rate || alsa.outfmt != output.outfmt ) {
+		if (!pcmp || alsa.rate != output.current_sample_rate ||
+			!( alsa.outfmt == output.outfmt || (alsa.outfmt == PCM && output.outfmt == DOP)
+			   || (alsa.outfmt == DOP && output.outfmt == PCM))) {
 #else
  		if (!pcmp || alsa.rate != output.current_sample_rate) {
 #endif
 			LOG_INFO("open output device: %s", output.device);
 			LOCK;
-
+#if DSD
+			// Some DACs (at least Matrix X-Sabre) fail on transitions between PCM 88.2kHz and native mode DSD64 tracks. 
+			// The following hack makes intermidiate device openning to PCM 44.1kHz between such transitions.
+			if (alsa.nat_dsd_mode_xhack && pcmp && alsa.rate == output.current_sample_rate)
+				alsa_open(output.device, 44100, output.buffer, output.period, PCM);
+#endif
++	
 			// FIXME - some alsa hardware requires opening twice for a new sample rate to work
 			// this is a workaround which should be removed
 			if (alsa.reopen) {
@@ -858,8 +866,8 @@ void output_init_alsa(log_level level, const char *device, unsigned output_buf_s
 	unsigned alsa_period = ALSA_PERIOD_COUNT;
 	char *alsa_sample_fmt = NULL;
 	bool alsa_mmap = true;
-	bool alsa_reopen = false;
-
+	unsigned alsa_flags = 0;
+	
 	char *volume_mixer_name = next_param(volume_mixer, ',');
 	char *volume_mixer_index = next_param(NULL, ',');
 
@@ -873,7 +881,7 @@ void output_init_alsa(log_level level, const char *device, unsigned output_buf_s
 	if (c) alsa_period = atoi(c);
 	if (s) alsa_sample_fmt = s;
 	if (m) alsa_mmap = atoi(m);
-	if (r) alsa_reopen = atoi(r);
+	if (r) alsa_flags = atoi(r);
 
 	loglevel = level;
 
@@ -885,10 +893,11 @@ void output_init_alsa(log_level level, const char *device, unsigned output_buf_s
 	alsa.write_buf = NULL;
 #if DSD
 	alsa.pcmfmt = 0;
+	alsa.nat_dsd_mode_xhack = ((alsa_flags & 2) != 0);
 #else
  	alsa.format = 0;
 #endif
-	alsa.reopen = alsa_reopen;
+	alsa.reopen = ((alsa_flags & 1) != 0);
 
 	if (!mixer_unmute) {
 		alsa.volume_mixer_name = volume_mixer_name;

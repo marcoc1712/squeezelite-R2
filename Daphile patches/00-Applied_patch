@@ -9,4 +9,6 @@ branch "Play_DSD_decoded_by_Mansr_sox" (future v. 1.8.5) include:
 10-24bit_dop_formats
 13-remove_last_block_zero_padding
 14-disable_dop_wav_resampling
+15-dop_pcm_transitions
+16-native_mode_transition_hack (manually)
 
