@@ -701,7 +701,7 @@ static void *output_thread(void *arg) {
 			if (alsa.nat_dsd_mode_xhack && pcmp && alsa.rate == output.current_sample_rate)
 				alsa_open(output.device, 44100, output.buffer, output.period, PCM);
 #endif
-+	
+	
 			// FIXME - some alsa hardware requires opening twice for a new sample rate to work
 			// this is a workaround which should be removed
 			if (alsa.reopen) {
