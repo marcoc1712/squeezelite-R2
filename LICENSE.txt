@@ -21,12 +21,42 @@ Based on:
 
    (c) Daphile 2015
 
+5. Patch to remove time limit from pcm stream
+   see https://github.com/marcoc1712/squeezelite/tree/remove_limit_from_pcm_streams.
+
+   (c) Marco Curti 2016, marcoc1712@gmail.com
+
+6. Patch to enable DSD 'native' playback on ALSA linux
+   see https://github.com/marcoc1712/squeezelite/Daphile patches:
+		07-native-dsd-support
+		10-24bit_dop_formats
+		13-remove_last_block_zero_padding
+		14-disable_dop_wav_resampling
+		15-dop_pcm_transitions
+		16-native_mode_transition_hack.
+
+   (c) Daphile 2015
+
 Released under GPLv3 license:
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+(at your option) any later version, provided that the following conditions are met: 
+
+   1. Redistributions of source code must retain the above copyright notice, this list of
+      conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice, this list
+      of conditions and the following disclaimer in the documentation and/or other materials
+      provided with the distribution.
+	
+   3. Redistribution of modified code (in any and every part) both in source or binary form 
+	  must must be clearly identifiable in regards of: 
+		
+		a. R2 identifier in version code (es. v1.8.5 (R2) -> v3.9.7 (xx)).
+		b. model name (es squeezelite-R2 -> squeezelite-xx). 
+		c  Copyright and support informaton at line 4.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

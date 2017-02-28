@@ -158,3 +158,11 @@ Version 1.8.3 (R2) 21/12/15
 
 No new Features.
 -- prevent premature EOF in sox's upsampled pcm streams.
+
+Version 1.8.4 (R2) 01/03/17
+===========================
+
+Features
+- Added support to 'native' DSD playback in ALSA
+- Minor changes in makefiles, RPI and FREEBSD are now supported.
+
