@@ -12,4 +12,5 @@ Starting form March, 15 2061 it's included in the squeezebox community official 
 Squeezelite-R2 v1.8.4 now incorporates some functionalities from Daphile: 
 
 1.Launched with -x prevent lms to downsample in case original samplerate is greater than the maximum imposed with -r in command line. 
+
 2.Using ALSA, is now possible to send DSD 'natives' formats (as opposed to DOP) to XMOS based USB interfaces or DACs.

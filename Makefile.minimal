@@ -1,4 +1,0 @@
-OPTS= -DLINUX -DALSA
-EXECUTABLE ?= squeezelite-R2-min
-
-include Makefile

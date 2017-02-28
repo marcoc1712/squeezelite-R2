@@ -1,0 +1,45 @@
+--- squeezelite-1.8/dsd.c.orig	2016-02-28 13:03:49.902977224 +0000
++++ squeezelite-1.8/dsd.c	2016-02-28 13:37:58.687512454 +0000
+@@ -211,6 +211,7 @@
+ 	
+ 	unsigned bytes = _buf_used(streambuf);
+ 	unsigned block_left = d->block_size;
++	unsigned padding = 0;
+ 	
+ 	unsigned bytes_per_frame;
+ 	switch (outfmt) {
+@@ -251,6 +252,22 @@
+ 			iptrr -= streambuf->size;
+ 		}
+ 		
++		// Remove zero padding from last block in case of inaccurate sample count 
++		if ((_buf_used(streambuf) == d->block_size * d->channels)
++			&& (d->sample_bytes > _buf_used(streambuf))) {
++			int i;
++			u8_t *ipl, *ipr;
++			for (i = d->block_size - 1; i > 0; i--) {
++				ipl = iptrl + i;
++				if (ipl >= streambuf->wrap) ipl -= streambuf->size;
++				ipr = iptrr + i;	
++				if (ipr >= streambuf->wrap) ipr -= streambuf->size;
++				if (*ipl || *ipr) break;
++				padding++;
++			}
++			block_left -= padding;
++		}
++
+ 		bytes = min(block_left, min(streambuf->wrap - iptrl, streambuf->wrap - iptrr));
+ 
+ 		IF_DIRECT(
+@@ -492,6 +509,11 @@
+ 		LOG_SDEBUG("write %u frames", frames);
+ 	}
+ 	
++	if (padding) {
++		_buf_inc_readp(streambuf, padding);
++		LOG_INFO("Zero padding removed: %u bytes", padding);
++	}
++	
+ 	// skip the other channel blocks
+ 	// the right channel has already been read and is guarenteed to be in streambuf so can be skipped immediately
+ 	if (d->channels > 1) {
