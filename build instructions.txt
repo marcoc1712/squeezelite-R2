@@ -1,0 +1,141 @@
+Dependencies
+
+Squeezelite-R2 requires header files for the following libraries to be present at 
+build time: * libasound2 * libflac * libmad0 * libvorbis * libfaad * libmpg123
+
+All above libraries are dynamically loaded and optional at runtime, meaning that 
+these libraries are only required on the build machine.
+
+It also optionally supports the following libraries which may be enabled by 
+defining additional build options: * libsoxr * libffmpeg
+
+/include and /Include-osx contains all the headers (dev-version) needed to produce 
+linux debian and osx versions.
+
+To build for osx you need a valid version of portaudio.a (static library)  in 
+./lib_osx folder.
+
+See squeezelite.vcxproj for dependencies in Windows.
+
+You should provide headers and statics libraries as needed by other platform 
+specific builds.
+
+Build Options
+
+Optional build options are enabled by passing additional defines to the compiler. 
+This may be done with the -D option to ggc or via setting OPTS before calling the 
+included makefiles. For example:
+
+OPTS="-DFFMPEG -DRESAMPLE" make
+
+The following build options are supported:
+
+* PORTAUDIO - build with port audio support (on linux only, it is not optional on other platforms) 
+* RESAMPLE - build with libsoxr support for real time upsampling 
+* FFMPEG - build with FFMPEG support for wma and alac support. Note that this requires the binary to be run 
+with FFMPEG library versions which match the header files used for compilation. 
+This is necessary and the ffmpeg api changes between versions. 
+* VISEXPORT - support export of audio data to jivelite for visualization support (linux only) 
+* DSD - support of DSD playback via 'natives' formats when possible or DOP.  
+
+Target Platforms
+
+Squeezelite-R2 can builds on debian linux, osx using included makefiles:
+
+- Makefile.debian
+- Makefile.osx
+
+It also builds using MSVC++ (tested with MSVC2010) on Windows (use squeezelite.vcxproj).
+
+Above versions are used to build the binary versions attached to each release.
+
+- Makefile.pa
+- Makefile.resample
+
+are just example on how to enable additiona features in linux.
+
+To produce your own makefile, set options and flags for your platform, specify 
+the executable name and include Makefile.
+
+To build on linux with support i.e for resampling if the same tree was previously 
+used to build with different options:
+
+OPTS=-DRESAMPLE make clean
+
+OPTS=-DRESAMPLE make
+
+Other Makefiles are provvided and tested by different users, they worked when added, 
+but are not tested by me on every new releases, so they should work but may not.
+
+here the list, please reports errors, or new you wish to add, using issues in gitHub.
+
+- Makefile.gentoo (replace LDFLAGS with EXTRALIBS, requires option to be declared in command line)
+
+  Produced by: Marco Curti 
+  First relased in version: 1.8.2
+  Last release was reported as working: 1.8.4
+  Reported as non working in release: never
+  Status: Working
+  
+  NOTES: 
+  You can use the Debian executable, is no way different, but this compiles on 
+  Gentoo, the other does not.
+  
+- Makefile.freebsd (needs some adjustement in ./include)
+
+  Produced by: Triode (?)
+  First relased in version: 1.8 (?)
+  Last release was reported as working: 1.8 (?)
+  Reported as non working in release: never
+  Status: Need test 
+  
+- Makefile.rpi (needs some adjustement in ./include)
+  
+  Produced by: Ralph Irving (?)
+  First relased in version: 1.8 (?)
+  Last release was reported as working: 1.8 (?)
+  Reported as non working in release: never
+  Status: Need test 
+
+- Makefile.osx-i386 (osx is dual arch, this is i386 only)
+
+  Produced by: Ralph Irving (?)
+  First relased in version: 1.8 (?)
+  Last release was reported as working: 1.8 (?)
+  Reported as non working in release: never
+  Status: obsolete.
+  
+  NOTES: 
+  Makefie.osx produces an executable with duèouble arch, so it's portable both on 
+  i386 and x86_64 machines. This one is not needed anymore.
+  
+- Makefile.osx-x86_64 (osx is dual arch, this is x86_64 only)
+
+  Produced by: Ralph Irving (?)
+  First relased in version: 1.8 (?)
+  Last release was reported as working: 1.8 (?)
+  Reported as non working in release: never
+  Status: obsolete.
+  
+  NOTES: 
+  Makefie.osx produces an executable with duèouble arch, so it's portable both on 
+  i386 and x86_64 machines. This one is not needed anymore.
+  
+- Makefile.osx-ppc (very old, but maybe works, who knows)
+  
+  Produced by: Ralph Irving (?)
+  First relased in version: 1.8 (?)
+  Last release was reported as working: 1.8 (?)
+  Reported as non working in release: never
+  Status: unknown, need test
+
+- Makefile.osx-ppc64 (very old, but maybe works, who knows)
+
+  Produced by: Ralph Irving (?)
+  First relased in version: 1.8 (?)
+  Last release was reported as working: 1.8 (?)
+  Reported as non working in release: never
+  Status: unknown,, need test
+
+
+
