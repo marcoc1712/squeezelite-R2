@@ -44,7 +44,7 @@ static snd_pcm_format_t fmts[] = { SND_PCM_FORMAT_S32_LE, SND_PCM_FORMAT_S24_LE,
 static struct {
 	char device[MAX_DEVICE_LEN + 1];
 	snd_pcm_format_t format;
-	bool nat_dsd_mode_xhack
+	bool nat_dsd_mode_xhack;
 #if DSD
 	dsd_format outfmt;
 	snd_pcm_format_t pcmfmt;
