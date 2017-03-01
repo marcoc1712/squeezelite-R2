@@ -267,7 +267,7 @@ int main(int argc, char **argv) {
 				   , opt) && optind < argc - 1) {
 			optarg = argv[optind + 1];
 			optind += 2;
-		} else if (strstr("ltz?"
+		} else if (strstr("ltzx?"
 #if ALSA
 						  "L"
 #endif
