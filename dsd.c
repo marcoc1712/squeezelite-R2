@@ -729,7 +729,7 @@ static decode_state _decode_dsdiff(void) {
 static decode_state dsd_decode(void) {
 	decode_state ret;
 	char *fmtstr;
-
+    
 	LOCK_S;
 
 	if ((stream.state <= DISCONNECT && !_buf_used(streambuf)) || (!decode.new_stream && d->sample_bytes == 0)) {
@@ -766,6 +766,7 @@ static decode_state dsd_decode(void) {
 		output.track_start = outputbuf->writep;
 
 		outfmt = output.dsdfmt;
+                fmtstr="";
 
 		switch (outfmt) {
 		case DSD_U32_LE:
