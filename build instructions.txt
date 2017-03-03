@@ -1,5 +1,7 @@
 Dependencies
 
+ALL PLATFORMS
+
 Squeezelite-R2 requires header files for the following libraries to be present at 
 build time: * libasound2 * libflac * libmad0 * libvorbis * libfaad * libmpg123
 
@@ -9,16 +11,53 @@ these libraries are only required on the build machine.
 It also optionally supports the following libraries which may be enabled by 
 defining additional build options: * libsoxr * libffmpeg
 
-/include and /Include-osx contains all the headers (dev-version) needed to produce 
-linux debian and osx versions.
+DEBIAN LINUX:
 
-To build for osx you need a valid version of portaudio.a (static library)  in 
+with alsa support (*):
+
+Depends: libasound2 
+Depends: libavcodec56  
+Depends: libavcodec-extra-56  
+Depends: libavformat56  
+Depends: libavutil54  
+Depends: libc6  
+Depends: libfaad2  
+Depends: libflac8  
+Depends: libmad0  
+Depends: libmpg123-0  
+Depends: libsoxr0  
+Depends: libvorbisfile3 
+
+(*) PLEASE NOTE: DSD option require ALSA >= 1.0.29 to work.
+Debian jessie 'stable' is not a candidate, works in Ubuntu 16.04LTS.
+
+with portaudio support:
+
+Depends: libportaudio2 
+Depends: libavcodec56  
+Depends: libavcodec-extra-56  
+Depends: libavformat56  
+Depends: libavutil54  
+Depends: libc6  
+Depends: libfaad2  
+Depends: libflac8  
+Depends: libmad0  
+Depends: libmpg123-0  
+Depends: libsoxr0  
+Depends: libvorbisfile3
+
+OSX
+
+Include-osx contains the headers needed to build, tested from 10.7 to .
+
+You need a valid version of portaudio.a (static library)  in 
 ./lib_osx folder.
+
+WINDOWS
 
 See squeezelite.vcxproj for dependencies in Windows.
 
-You should provide headers and statics libraries as needed by other platform 
-specific builds.
+You should provide statics libraries as needed by other platform 
 
 Build Options
 
@@ -42,7 +81,7 @@ Target Platforms
 
 Squeezelite-R2 can builds on debian linux, osx using included makefiles:
 
-- Makefile.debian
+- Makefile.debian (*)
 - Makefile.osx
 
 It also builds using MSVC++ (tested with MSVC2010) on Windows (use squeezelite.vcxproj).
@@ -81,7 +120,7 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   You can use the Debian executable, is no way different, but this compiles on 
   Gentoo, the other does not.
   
-- Makefile.freebsd (needs some adjustement in ./include)
+- Makefile.freebsd (*)
 
   Produced by: Triode (?)
   First relased in version: 1.8 (?)
@@ -89,7 +128,7 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   Reported as non working in release: never
   Status: Need test 
   
-- Makefile.rpi (needs some adjustement in ./include)
+- Makefile.rpi (*)
   
   Produced by: Ralph Irving (?)
   First relased in version: 1.8 (?)
@@ -102,11 +141,11 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   Produced by: Ralph Irving (?)
   First relased in version: 1.8 (?)
   Last release was reported as working: 1.8 (?)
-  Reported as non working in release: never
+  Reported as non working in release: 1.8.4 by Simone Filippini (info@simonefilippini.it)
   Status: obsolete.
   
   NOTES: 
-  Makefie.osx produces an executable with duèouble arch, so it's portable both on 
+  Makefie.osx produces an executable with double arch, so it's portable both on 
   i386 and x86_64 machines. This one is not needed anymore.
   
 - Makefile.osx-x86_64 (osx is dual arch, this is x86_64 only)
@@ -114,14 +153,14 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   Produced by: Ralph Irving (?)
   First relased in version: 1.8 (?)
   Last release was reported as working: 1.8 (?)
-  Reported as non working in release: never
+  Reported as non working in release: 1.8.4 by Simone Filippini (info@simonefilippini.it)
   Status: obsolete.
   
   NOTES: 
-  Makefie.osx produces an executable with duèouble arch, so it's portable both on 
+  Makefie.osx produces an executable with double arch, so it's portable both on 
   i386 and x86_64 machines. This one is not needed anymore.
   
-- Makefile.osx-ppc (very old, but maybe works, who knows)
+- Makefile.osx-ppc (very old, but maybe works)
   
   Produced by: Ralph Irving (?)
   First relased in version: 1.8 (?)
@@ -129,13 +168,10 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   Reported as non working in release: never
   Status: unknown, need test
 
-- Makefile.osx-ppc64 (very old, but maybe works, who knows)
+- Makefile.osx-ppc64 (very old, but maybe works)
 
   Produced by: Ralph Irving (?)
   First relased in version: 1.8 (?)
   Last release was reported as working: 1.8 (?)
   Reported as non working in release: never
   Status: unknown,, need test
-
-
-
