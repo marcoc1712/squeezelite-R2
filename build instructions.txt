@@ -112,7 +112,7 @@ here the list, please reports errors, or new you wish to add, using issues in gi
 
   Produced by: Marco Curti 
   First relased in version: 1.8.2
-  Last release was reported as working: 1.8.4
+  Last release was reported as working: 1.8.4 by Marco Curti
   Reported as non working in release: never
   Status: Working
   
@@ -120,21 +120,35 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   You can use the Debian executable, is no way different, but this compiles on 
   Gentoo, the other does not.
   
-- Makefile.freebsd (*)
+- Makefile.freebsd
 
   Produced by: Triode (?)
   First relased in version: 1.8 (?)
-  Last release was reported as working: 1.8 (?)
+  Modified by: Simone Filippini (info@simonefilippini.it)
+  Last release was reported as working: 1.8.4 by Simone Filippini (info@simonefilippini.it)
   Reported as non working in release: never
-  Status: Need test 
+  Status: ALPHA: Needs test 
   
 - Makefile.rpi (*)
   
   Produced by: Ralph Irving (?)
+  Modified by: Simone Filippini (info@simonefilippini.it)
   First relased in version: 1.8 (?)
-  Last release was reported as working: 1.8 (?)
+  Last release was reported as working: 1.8.4 by Simone Filippini (info@simonefilippini.it)
   Reported as non working in release: never
-  Status: Need test 
+  Status: Working
+
+  NOTES:
+  It works for RPI2, needs adjustments in FLAGS for RPI or RPI3.
+  DSD Works in Ubuntu non in raspbian (*).
+
+- Makefile.raspbsd
+
+  Produced by: Simone Filippini (info@simonefilippini.it)
+  First relased in version: 1.8.4
+  Last release was reported as working: 1.8.4
+  Reported as non working in release: never
+  Status: ALPHA: Needs test 
 
 - Makefile.osx-i386 (osx is dual arch, this is i386 only)
 

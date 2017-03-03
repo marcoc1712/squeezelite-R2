@@ -1,8 +1,5 @@
 Cose da fare per 1.8.4
 
-Simone:
-indicazioni su BUILDINSTRUCTIONS x RPI, RaspBSD e FreeBSD.
-
 Paolo:
 OK per versione Debian (su Ubuntu 16.04LTS?)
 
@@ -11,6 +8,7 @@ conferma x gento ed OK
 conferma OK per windows.
 
 Marco
+Verificare BUILD in WIndows
 Chiiudere BUILD INSTRUCTION
 Predisporre release in GitHub. 
 Aggiornare sito.
