@@ -107,19 +107,7 @@ Other Makefiles are provvided and tested by different users, they worked when ad
 but are not tested by me on every new releases, so they should work but may not.
 
 here the list, please reports errors, or new you wish to add, using issues in gitHub.
-
-- Makefile.gentoo (replace LDFLAGS with EXTRALIBS, requires option to be declared in command line)
-
-  Produced by: Marco Curti 
-  First relased in version: 1.8.2
-  Last release was reported as working: 1.8.4 by Marco Curti
-  Reported as non working in release: never
-  Status: Working
-  
-  NOTES: 
-  You can use the Debian executable, is no way different, but this compiles on 
-  Gentoo, the other does not.
-  
+ 
 - Makefile.freebsd
 
   Produced by: Triode (?)

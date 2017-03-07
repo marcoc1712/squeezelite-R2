@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="100">
+<configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
+      <df name=".vs">
+        <df name="squeezelite-mc2">
+          <df name="v14">
+          </df>
+        </df>
+      </df>
       <df name="Bin">
       </df>
       <df name="Daphile patches">
@@ -200,6 +206,140 @@
         <in>pa_mac_core.h</in>
         <in>portaudio.h</in>
       </df>
+      <df name="include-rpi">
+        <df name="FLAC">
+          <in>all.h</in>
+          <in>assert.h</in>
+          <in>callback.h</in>
+          <in>export.h</in>
+          <in>format.h</in>
+          <in>metadata.h</in>
+          <in>ordinals.h</in>
+          <in>stream_decoder.h</in>
+          <in>stream_encoder.h</in>
+        </df>
+        <df name="libavcodec">
+          <in>avcodec.h</in>
+          <in>avfft.h</in>
+          <in>d3d11va.h</in>
+          <in>dv_profile.h</in>
+          <in>dxva2.h</in>
+          <in>qsv.h</in>
+          <in>vaapi.h</in>
+          <in>vda.h</in>
+          <in>vdpau.h</in>
+          <in>version.h</in>
+          <in>videotoolbox.h</in>
+          <in>vorbis_parser.h</in>
+          <in>xvmc.h</in>
+        </df>
+        <df name="libavdevice">
+          <in>avdevice.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libavfilter">
+          <in>avfilter.h</in>
+          <in>avfiltergraph.h</in>
+          <in>buffersink.h</in>
+          <in>buffersrc.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libavformat">
+          <in>avformat.h</in>
+          <in>avio.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libavutil">
+          <in>adler32.h</in>
+          <in>aes.h</in>
+          <in>attributes.h</in>
+          <in>audio_fifo.h</in>
+          <in>avassert.h</in>
+          <in>avconfig.h</in>
+          <in>avstring.h</in>
+          <in>avutil.h</in>
+          <in>base64.h</in>
+          <in>blowfish.h</in>
+          <in>bprint.h</in>
+          <in>bswap.h</in>
+          <in>buffer.h</in>
+          <in>camellia.h</in>
+          <in>cast5.h</in>
+          <in>channel_layout.h</in>
+          <in>common.h</in>
+          <in>cpu.h</in>
+          <in>crc.h</in>
+          <in>dict.h</in>
+          <in>display.h</in>
+          <in>downmix_info.h</in>
+          <in>error.h</in>
+          <in>eval.h</in>
+          <in>ffversion.h</in>
+          <in>fifo.h</in>
+          <in>file.h</in>
+          <in>frame.h</in>
+          <in>hash.h</in>
+          <in>hmac.h</in>
+          <in>imgutils.h</in>
+          <in>intfloat.h</in>
+          <in>intreadwrite.h</in>
+          <in>lfg.h</in>
+          <in>log.h</in>
+          <in>lzo.h</in>
+          <in>macros.h</in>
+          <in>mathematics.h</in>
+          <in>md5.h</in>
+          <in>mem.h</in>
+          <in>motion_vector.h</in>
+          <in>murmur3.h</in>
+          <in>opencl.h</in>
+          <in>opt.h</in>
+          <in>parseutils.h</in>
+          <in>pixdesc.h</in>
+          <in>pixelutils.h</in>
+          <in>pixfmt.h</in>
+          <in>random_seed.h</in>
+          <in>rational.h</in>
+          <in>replaygain.h</in>
+          <in>ripemd.h</in>
+          <in>samplefmt.h</in>
+          <in>sha.h</in>
+          <in>sha512.h</in>
+          <in>stereo3d.h</in>
+          <in>tea.h</in>
+          <in>threadmessage.h</in>
+          <in>time.h</in>
+          <in>timecode.h</in>
+          <in>timestamp.h</in>
+          <in>twofish.h</in>
+          <in>version.h</in>
+          <in>xtea.h</in>
+        </df>
+        <df name="libpostproc">
+          <in>postprocess.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libswresample">
+          <in>swresample.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="libswscale">
+          <in>swscale.h</in>
+          <in>version.h</in>
+        </df>
+        <df name="ogg">
+          <in>ogg.h</in>
+          <in>os_types.h</in>
+        </df>
+        <df name="vorbis">
+          <in>codec.h</in>
+          <in>vorbisenc.h</in>
+          <in>vorbisfile.h</in>
+        </df>
+        <in>mad.h</in>
+        <in>neaacdec.h</in>
+        <in>soxr.h</in>
+      </df>
       <df name="lib_osx">
       </df>
       <df name="patches">
@@ -209,6 +349,8 @@
           <df name="Final">
           </df>
           <df name="Intermediate">
+            <df name="squeezelite-R2.tlog">
+            </df>
           </df>
         </df>
       </df>
@@ -248,7 +390,7 @@
     <conf name="Default" type="0">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compile>
         <compiledirpicklist>
