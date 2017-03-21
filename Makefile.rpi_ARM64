@@ -1,0 +1,5 @@
+CFLAGS  ?= -Wall -fPIC -s -O3 -march=armv8-a+crc -mtune=cortex-a53 -DLINUX -DDSD -DALSA $(OPTS)
+LDFLAGS ?= -s -lasound -lpthread -lm -ldl -lrt -Wl,-rpath,/usr/local/lib
+EXECUTABLE ?= squeezelite-rpi3
+
+include Makefile

@@ -1,6 +1,5 @@
-OPTS = -DDSD -DALSA -I./include-rpi
-CFLAGS  ?= -Wall -fPIC -s -O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard $(OPTS)
+CFLAGS  ?= -Wall -fPIC -s -O3 -march=armv7-a -mtune=cortex-a7 -DLINUX -DDSD -DALSA $(OPTS)
 LDFLAGS ?= -s -lasound -lpthread -lm -ldl -lrt -Wl,-rpath,/usr/local/lib
-EXECUTABLE ?= ./Bin/squeezelite-rpi2
+EXECUTABLE ?= squeezelite-rpi2
 
 include Makefile
