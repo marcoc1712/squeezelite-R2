@@ -130,7 +130,27 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   It works for RPI2, needs adjustments in FLAGS for RPI or RPI3.
   DSD Works in Ubuntu non in raspbian (*).
 
+- Makefile.rpi_ARM64 (*)
+  
+  Produced by: Simone Filippini (info@simonefilippini.it)
+  First relased in version: 1.8.4 
+  Last release was reported as working: 1.8.4 by Simone Filippini (info@simonefilippini.it)
+  Reported as non working in release: never
+  Status: Working
+
+  NOTES:
+  It works for RPI2, needs adjustments in FLAGS for RPI or RPI3.
+  DSD Works in Ubuntu non in raspbian (*).
+
 - Makefile.raspbsd
+
+  Produced by: Simone Filippini (info@simonefilippini.it)
+  First relased in version: 1.8.4
+  Last release was reported as working: 1.8.4
+  Reported as non working in release: never
+  Status: ALPHA: Needs test 
+
+- Makefile.raspbsd_ARM64
 
   Produced by: Simone Filippini (info@simonefilippini.it)
   First relased in version: 1.8.4
