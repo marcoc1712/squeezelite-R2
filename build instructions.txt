@@ -197,3 +197,5 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   Last release was reported as working: 1.8 (?)
   Reported as non working in release: never
   Status: unknown,, need test
+
+More at: https://audiodigitale.eu/
