@@ -163,6 +163,5 @@ Version 1.8.4 (R2) 01/03/17
 ===========================
 
 Features
-- Added support to 'native' DSD playback in ALSA
-- Minor changes in makefiles, RPI and FREEBSD are now supported.
-
+- Added support to 'native' DSD playback in ALSA (tanks to Daphile)
+- Minor changes in makefiles, RPI and FREEBSD are now supported (tanks to SimoneFil)
