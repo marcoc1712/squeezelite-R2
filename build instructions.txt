@@ -28,9 +28,6 @@ Depends: libmpg123-0
 Depends: libsoxr0  
 Depends: libvorbisfile3 
 
-(*) PLEASE NOTE: DSD option require ALSA >= 1.0.29 to work.
-Debian jessie 'stable' is not a candidate, works in Ubuntu 16.04LTS.
-
 with portaudio support:
 
 Depends: libportaudio2 
@@ -48,7 +45,7 @@ Depends: libvorbisfile3
 
 OSX
 
-Include-osx contains the headers needed to build, tested from 10.7 to .
+Include-osx contains the headers needed to build, tested from 10.7 to latest.
 
 You need a valid version of portaudio.a (static library)  in 
 ./lib_osx folder.
@@ -199,3 +196,8 @@ here the list, please reports errors, or new you wish to add, using issues in gi
   Status: unknown,, need test
 
 More at: https://audiodigitale.eu/
+
+(*) PLEASE NOTE: DSD option require ALSA >= 1.0.29 to work.
+Debian jessie 'stable' is not a candidate, works in Ubuntu 16.04LTS.
+
+To compile without DSD support, edit the Makefile.xxx and remove -DSD option.
