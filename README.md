@@ -10,3 +10,5 @@ This version was originally meant to inspect pcm header to detect the real sampl
 October, 4 2015 R2 features has been incorporated in Daphile, March,  10 2016 in Audiolinux.
 
 Since March, 15 2016 it's included in the squeezebox community version of squeezelite, mantained by Ralph Irving.
+
+download last verison of squeezelite-R2: https://github.com/marcoc1712/squeezelite-R2/releases
