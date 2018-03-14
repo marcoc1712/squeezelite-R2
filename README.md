@@ -11,4 +11,4 @@ October, 4 2015 R2 features has been incorporated in Daphile, March,  10 2016 in
 
 Since March, 15 2016 it's included in the squeezebox community version of squeezelite, mantained by Ralph Irving.
 
-download last verison of squeezelite-R2: https://github.com/marcoc1712/squeezelite-R2/releases
+Download page: https://github.com/marcoc1712/squeezelite-R2/releases
