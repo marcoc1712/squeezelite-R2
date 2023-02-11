@@ -1,4 +1,4 @@
-/* 
+/*
  *  Squeezelite - lightweight headless squeezeplay emulator for linux
  *
  *  (c) Adrian Smith 2012, triode1@btinternet.com
@@ -7,7 +7,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -110,7 +110,7 @@ static FLAC__StreamDecoderWriteStatus write_cb(const FLAC__StreamDecoder *decode
 
 	FLAC__int32 *lptr = (FLAC__int32 *)buffer[0];
 	FLAC__int32 *rptr = (FLAC__int32 *)buffer[channels > 1 ? 1 : 0];
-	
+
 	if (decode.new_stream) {
 		LOCK_O;
 		LOG_INFO("setting track_start");
@@ -122,7 +122,7 @@ static FLAC__StreamDecoderWriteStatus write_cb(const FLAC__StreamDecoder *decode
 #define MARKER_OFFSET 2
 #else
 #define MARKER_OFFSET 1
-#endif		
+#endif
 		if (bits_per_sample == 24 && is_stream_dop(((u8_t *)lptr) + MARKER_OFFSET, ((u8_t *)rptr) + MARKER_OFFSET, 4, frames)) {
 			LOG_INFO("file contains DOP");
 			if (output.dsdfmt == DOP_S24_LE || output.dsdfmt == DOP_S24_3LE)
@@ -151,9 +151,9 @@ static FLAC__StreamDecoderWriteStatus write_cb(const FLAC__StreamDecoder *decode
 		frames_t count;
 		s32_t *optr;
 
-		IF_DIRECT( 
-			optr = (s32_t *)outputbuf->writep; 
-			f = min(_buf_space(outputbuf), _buf_cont_write(outputbuf)) / BYTES_PER_FRAME; 
+		IF_DIRECT(
+			optr = (s32_t *)outputbuf->writep;
+			f = min(_buf_space(outputbuf), _buf_cont_write(outputbuf)) / BYTES_PER_FRAME;
 		);
 		IF_PROCESS(
 			optr = (s32_t *)process.inbuf;
@@ -225,11 +225,11 @@ static void flac_close(void) {
 static decode_state flac_decode(void) {
 	bool ok = FLAC(f, stream_decoder_process_single, f->decoder);
 	FLAC__StreamDecoderState state = FLAC(f, stream_decoder_get_state, f->decoder);
-	
+
 	if (!ok && state != FLAC__STREAM_DECODER_END_OF_STREAM) {
 		LOG_INFO("flac error: %s", FLAC_A(f, StreamDecoderStateString)[state]);
 	};
-	
+
 	if (state == FLAC__STREAM_DECODER_END_OF_STREAM) {
 		return DECODE_COMPLETE;
 	} else if (state > FLAC__STREAM_DECODER_END_OF_STREAM) {
@@ -241,8 +241,13 @@ static decode_state flac_decode(void) {
 
 static bool load_flac() {
 #if !LINKALL
-	void *handle = dlopen(LIBFLAC, RTLD_NOW);
+	void *handle = NULL;
+	char name[30];
 	char *err;
+
+	sprintf(name, LIBFLAC, FLAC_API_VERSION_CURRENT < 12 ? 8 : 12);
+
+  handle = dlopen(name, RTLD_NOW);
 
 	if (!handle) {
 		LOG_INFO("dlerror: %s", dlerror());
@@ -259,18 +264,18 @@ static bool load_flac() {
 	f->FLAC__stream_decoder_get_state = dlsym(handle, "FLAC__stream_decoder_get_state");
 
 	if ((err = dlerror()) != NULL) {
-		LOG_INFO("dlerror: %s", err);		
+		LOG_INFO("dlerror: %s", err);
 		return false;
 	}
 
-	LOG_INFO("loaded "LIBFLAC);
+	LOG_INFO("loaded %s", name);
 #endif
 
 	return true;
 }
 
 struct codec *register_flac(void) {
-	static struct codec ret = { 
+	static struct codec ret = {
 		'f',          // id
 		"flc",        // types
 		8192,         // min read

@@ -1,13 +1,13 @@
-/* 
+/*
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -138,7 +138,7 @@
 // dynamically loaded libraries at run time
 
 #if LINUX
-#define LIBFLAC "libFLAC.so.8"
+#define LIBFLAC "libFLAC.so.%d"
 #define LIBMAD  "libmad.so.0"
 #define LIBMPG "libmpg123.so.0"
 #define LIBVORBIS "libvorbisfile.so.3"
@@ -152,7 +152,7 @@
 #endif
 
 #if OSX
-#define LIBFLAC "libFLAC.8.dylib"
+#define LIBFLAC "libFLAC.%d.dylib"
 #define LIBMAD  "libmad.0.dylib"
 #define LIBMPG "libmpg123.0.dylib"
 #define LIBVORBIS "libvorbisfile.3.dylib"
@@ -178,7 +178,7 @@
 #endif
 
 #if FREEBSD
-#define LIBFLAC "libFLAC.so.11"
+#define LIBFLAC "libFLAC.so.%d"
 #define LIBMAD  "libmad.so.2"
 #define LIBMPG "libmpg123.so.0"
 #define LIBVORBIS "libvorbisfile.so.6"
@@ -325,7 +325,7 @@ typedef int sockfd;
 #define wake_signal(e) write(e.fds[1], ".", 1)
 #define wake_clear(e) char c[10]; read(e, &c, 10)
 #define wake_close(e) close(e.fds[0]); close(e.fds[1])
-struct wake { 
+struct wake {
 	int fds[2];
 };
 #endif
@@ -514,7 +514,7 @@ bool resample_init(char *opt);
 #endif
 
 // output.c output_alsa.c output_pa.c output_pack.c
-typedef enum { OUTPUT_OFF = -1, OUTPUT_STOPPED = 0, OUTPUT_BUFFER, OUTPUT_RUNNING, 
+typedef enum { OUTPUT_OFF = -1, OUTPUT_STOPPED = 0, OUTPUT_BUFFER, OUTPUT_RUNNING,
 			   OUTPUT_PAUSE_FRAMES, OUTPUT_SKIP_FRAMES, OUTPUT_START_AT } output_state;
 
 #if DSD
@@ -539,7 +539,7 @@ struct outputstate {
 	unsigned buffer;
 	unsigned period;
 #endif
-	bool  track_started; 
+	bool  track_started;
 #if PORTAUDIO
 	bool  pa_reopen;
 	unsigned latency;
@@ -600,7 +600,7 @@ void list_devices(void);
 void list_mixers(const char *output_device);
 void set_volume(unsigned left, unsigned right);
 bool test_open(const char *device, unsigned rates[]);
-void output_init_alsa(log_level level, const char *device, unsigned output_buf_size, char *params, unsigned rates[], 
+void output_init_alsa(log_level level, const char *device, unsigned output_buf_size, char *params, unsigned rates[],
 					  unsigned rate_delay, unsigned rt_priority, unsigned idle, char *volume_mixer, bool mixer_unmute);
 void output_close_alsa(void);
 #endif
