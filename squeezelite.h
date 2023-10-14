@@ -94,6 +94,13 @@
 #define RESAMPLE_MP 0
 #endif
 
+#if defined(FAAD)
+#undef FAAD
+#define FAAD    1
+#else
+#define FAAD    0
+#endif
+
 #if defined(FFMPEG)
 #undef FFMPEG
 #define FFMPEG    1

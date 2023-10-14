@@ -20,6 +20,8 @@
 
 #include "squeezelite.h"
 
+#if FAAD
+
 #include <neaacdec.h>
 
 #define WRAPBUF_LEN 2048
@@ -640,3 +642,5 @@ struct codec *register_faad(void) {
 	LOG_INFO("using faad to decode aac");
 	return &ret;
 }
+
+#endif

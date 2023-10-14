@@ -25,7 +25,10 @@
 #define TITLE "Squeezelite Copyright 2012-2015 Adrian Smith.\n"
 #define MODINFO "this modified version (" VERSION "), Copyright 2015 -2017 Marco Curti."
 #define MODINFO2 "see https://github.com/marcoc1712/squeezelite-R2\n"
-#define CODECS_BASE "flac,pcm,mp3,ogg,aac"
+#define CODECS_BASE "flac,pcm,mp3,ogg"
+#if FAAD
+#define CODECS_FAAD   ",aac"
+#else
 #if FFMPEG
 #define CODECS_FF   ",wma,alac"
 #else
@@ -149,6 +152,9 @@ static void usage(const char *argv0) {
 #if RESAMPLE
 		   " RESAMPLE"
 #endif
+#endif
+#if FAAD
+		   " FAAAD"
 #endif
 #if FFMPEG
 		   " FFMPEG"

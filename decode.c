@@ -138,7 +138,10 @@ void decode_init(log_level level, const char *include_codecs, const char *exclud
 	if (!strstr(exclude_codecs, "alac") && (!include_codecs || strstr(include_codecs, "alac")))  codecs[i++] = register_ff("alc");
 	if (!strstr(exclude_codecs, "wma")  && (!include_codecs || strstr(include_codecs, "wma")))   codecs[i++] = register_ff("wma");
 #endif
-	if (!strstr(exclude_codecs, "aac")  && (!include_codecs || strstr(include_codecs, "aac")))  codecs[i++] = register_faad();
+#if FADD
+	if (!strstr(exclude_codecs, "aac") && (!include_codecs || strstr(include_codecs, "aac")))  codecs[i++] = register_faad();
+#endif
+
 	if (!strstr(exclude_codecs, "ogg")  && (!include_codecs || strstr(include_codecs, "ogg")))  codecs[i++] = register_vorbis();
 	if (!strstr(exclude_codecs, "flac") && (!include_codecs || strstr(include_codecs, "flac"))) codecs[i++] = register_flac();
 	if (!strstr(exclude_codecs, "pcm")  && (!include_codecs || strstr(include_codecs, "pcm")))  codecs[i++] = register_pcm();

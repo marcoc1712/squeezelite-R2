@@ -5,6 +5,7 @@ EXECUTABLE ?= squeezelite-R2
 
 # passing one or more of these in $(OPTS) enables optional feature inclusion
 OPT_DSD     = -DDSD
+OPT_FAAD    = -DFAAD
 OPT_FF      = -DFFMPEG
 OPT_LINKALL = -DLINKALL
 OPT_RESAMPLE= -DRESAMPLE
@@ -14,8 +15,9 @@ OPT_IR      = -DIR
 SOURCES = \
 	main.c slimproto.c buffer.c stream.c utils.c \
 	output.c output_alsa.c output_pa.c output_stdout.c output_pack.c decode.c \
-	flac.c pcm.c mad.c vorbis.c faad.c mpg.c
+	flac.c pcm.c mad.c vorbis.c mpg.c
 
+SOURCES_FAAD	 = faad.c
 SOURCES_DSD      = dsd.c dop.c dsd2pcm/dsd2pcm.c
 SOURCES_FF       = ffmpeg.c
 SOURCES_RESAMPLE = process.c resample.c
@@ -24,7 +26,8 @@ SOURCES_IR       = ir.c
 
 LINK_LINUX       = -ldl
 
-LINKALL          = -lFLAC -lmad -lvorbisfile -lfaad -lmpg123
+LINKALL          = -lFLAC -lmad -lvorbisfile -lmpg123
+LINKALL_FAAD	 = -lfaad
 LINKALL_FF       = -lavcodec -lavformat -lavutil
 LINKALL_RESAMPLE = -lsoxr
 LINKALL_IR       = -llirc_client
@@ -36,6 +39,9 @@ UNAME            = $(shell uname -s)
 # add optional sources
 ifneq (,$(findstring $(OPT_DSD), $(CFLAGS)))
 	SOURCES += $(SOURCES_DSD)
+endif
+ifneq (,$(findstring $(OPT_FAAD), $(CFLAGS)))
+	SOURCES += $(SOURCES_FAAD)
 endif
 ifneq (,$(findstring $(OPT_FF), $(CFLAGS)))
 	SOURCES += $(SOURCES_FF)
@@ -53,6 +59,9 @@ endif
 # add optional link options
 ifneq (,$(findstring $(OPT_LINKALL), $(CFLAGS)))
 	LDFLAGS += $(LINKALL)
+ifneq (,$(findstring $(OPT_FAAD), $(CFLAGS)))
+	LDFLAGS += $(LINKALL_FAAD)
+endif
 ifneq (,$(findstring $(OPT_FF), $(CFLAGS)))
 	LDFLAGS += $(LINKALL_FF)
 endif
