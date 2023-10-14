@@ -1,0 +1,4 @@
+OPTS= -DLINUX -DALSA -DDSD
+EXECUTABLE ?= ./Bin/squeezelite-R2-fedora
+
+include Makefile

@@ -1,6 +1,6 @@
 # Use gmake to compile on FreeBSD, before compiling -> sudo pkg install portaudio gmake flac libmad faad2 mpg123 libvorbis
 
-CFLAGS = -DDSD
+CFLAGS = -DDSD -DFAAD
 CPPFLAGS = -I/usr/local/include -I/usr/local/include/portaudio2
 LDFLAGS = -L/usr/local/lib -L/usr/local/lib/portaudio2 -lportaudio -lpthread -lm
 EXECUTABLE = squeezelite-freebsd
