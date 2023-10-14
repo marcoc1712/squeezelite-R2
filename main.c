@@ -29,6 +29,8 @@
 #if FAAD
 #define CODECS_FAAD   ",aac"
 #else
+#define CODECS_FAAD   ""
+#endif
 #if FFMPEG
 #define CODECS_FF   ",wma,alac"
 #else
