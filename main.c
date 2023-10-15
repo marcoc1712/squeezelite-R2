@@ -156,7 +156,7 @@ static void usage(const char *argv0) {
 #endif
 #endif
 #if FAAD
-		   " FAAAD"
+		   " FAAD"
 #endif
 #if FFMPEG
 		   " FFMPEG"
